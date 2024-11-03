@@ -14,11 +14,30 @@ public class CameraController : MonoBehaviour
 
     [Header("락온 설정")]
     [SerializeField] RectTransform lockonUi;
+    [SerializeField] float lookSmoothTime = 0.01f;
     [SerializeField] float lockonMaxDistance = 30f;
     [SerializeField] float lockonMinSize = 0.1f;
     [SerializeField] float lockonMaxSize = 1f;
 
     Transform lockon = null;
+    Vector3 lookVelocity = Vector3.zero;
+    Vector3 trackPos = Vector3.zero;
+
+    public Vector3 TrackPos
+    {
+        get { return trackPos; }
+    }
+
+    public Transform Lockon
+    {
+        get { return lockon; }
+    }
+
+    public Vector3 GetLookVector(Vector3 from, Vector3 to, bool removeY = false)
+    {
+        if (removeY) from = new Vector3(from.x, to.y, from.z);
+        return Vector3.Normalize(to - from);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -29,13 +48,15 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        trackPos = camTarget.position + camOffset;
         CheckLockon();
-        Vector3 trackPos = camTarget.position + camOffset;
 
         if (lockon)
         {
+            Vector3 lookVector = GetLookVector(trackPos, lockon.position);
             transform.position = trackPos;
-            transform.LookAt(lockon);
+            transform.forward = Vector3.SmoothDamp(transform.forward, lookVector, ref lookVelocity, lookSmoothTime);
+            //transform.LookAt(lockon);
             transform.position += transform.forward * -camDistance;
 
             float distance = Vector3.Distance(Camera.main.transform.position, lockon.position);
