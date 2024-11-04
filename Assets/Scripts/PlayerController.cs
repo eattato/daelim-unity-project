@@ -7,22 +7,16 @@ public class PlayerController : Entity
     [SerializeField] float rollSpeed = 10;
     [SerializeField] float rollTime = 0.5f;
     [SerializeField] float rollStunTime = 0.5f;
-    [SerializeField] float rotationSmoothTime = 0.1f;
     [SerializeField] Transform sword;
 
-    Rigidbody rigid;
     Thruster thruster;
     CameraController camController;
     RaycastHitbox hitbox;
 
-    bool movable = true;
-    bool invinsible = false;
-    Vector3 rotationVelocity = Vector3.zero;
-
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        rigid = GetComponent<Rigidbody>();
+        base.Start();
         thruster = GetComponent<Thruster>();
         camController = Camera.main.GetComponent<CameraController>();
         hitbox = sword.GetComponent<RaycastHitbox>();
@@ -60,7 +54,7 @@ public class PlayerController : Entity
 
         if (camController.Lockon)
         {
-            Vector3 lookVector = camController.GetLookVector(camController.TrackPos, camController.Lockon.position, true);
+            Vector3 lookVector = Vector3Utils.LookVector(camController.TrackPos, camController.Lockon.position, true);
             transform.forward = Vector3.SmoothDamp(
                 transform.forward, lookVector, ref rotationVelocity, rotationSmoothTime
             );

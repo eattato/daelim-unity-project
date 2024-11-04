@@ -33,12 +33,6 @@ public class CameraController : MonoBehaviour
         get { return lockon; }
     }
 
-    public Vector3 GetLookVector(Vector3 from, Vector3 to, bool removeY = false)
-    {
-        if (removeY) from = new Vector3(from.x, to.y, from.z);
-        return Vector3.Normalize(to - from);
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -53,7 +47,7 @@ public class CameraController : MonoBehaviour
 
         if (lockon)
         {
-            Vector3 lookVector = GetLookVector(trackPos, lockon.position);
+            Vector3 lookVector = Vector3Utils.LookVector(trackPos, lockon.position);
             transform.position = trackPos;
             transform.forward = Vector3.SmoothDamp(transform.forward, lookVector, ref lookVelocity, lookSmoothTime);
             //transform.LookAt(lockon);
