@@ -25,6 +25,7 @@ public class SoundPart : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (!Application.isPlaying) return;
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, soundRange);
     }

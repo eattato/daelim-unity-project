@@ -30,7 +30,8 @@ public class RaycastHitbox : MonoBehaviour
             foreach (Transform point in hitPoints)
             {
                 Vector3 oldPos = oldPoints.ContainsKey(point) ? oldPoints[point] : point.position;
-                RaycastHit[] hits = Physics.RaycastAll(oldPos, point.position - oldPos);
+                Vector3 direction = point.position - oldPos;
+                RaycastHit[] hits = Physics.RaycastAll(oldPos, direction.normalized, direction.magnitude);
                 totalHits.AddRange(hits);
                 oldPoints[point] = point.position;
             }

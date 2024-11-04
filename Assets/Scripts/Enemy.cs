@@ -65,6 +65,7 @@ public class Enemy : Entity
 
     void OnDrawGizmos()
     {
+        if (!Application.isPlaying) return;
         if (status == Status.Attack) return;
 
         float angle = sightAngle / sightSplit;
@@ -72,11 +73,19 @@ public class Enemy : Entity
         {
             for (int x = -sightSplit / 2; x <= sightSplit; x++)
             {
-                Vector3 direction = Quaternion.Euler(new Vector3(angle * y, angle * x, 0)) * transform.forward;
+                //Vector3 direction = Quaternion.Euler(new Vector3(angle * y, angle * x, 0)) * transform.forward;
+                Vector3 direction = Quaternion.AngleAxis(angle * x, transform.right) * transform.forward;
+                direction = Quaternion.AngleAxis(angle * y, transform.up) * direction;
+
                 Vector3 detectionSightPos = transform.position + sightPos;
+                Vector3 rayEndPoint = detectionSightPos + direction * sightRange;
+
+                RaycastHit hit;
+                bool isHit = Physics.Raycast(transform.position + sightPos, direction, out hit, sightRange);
+                if (isHit) rayEndPoint = hit.point;
 
                 Gizmos.color = Color.red;
-                Gizmos.DrawLine(detectionSightPos, detectionSightPos + direction * sightRange);
+                Gizmos.DrawLine(detectionSightPos, rayEndPoint);
             }
         }
 
@@ -103,10 +112,12 @@ public class Enemy : Entity
         {
             for (int x = -sightSplit / 2; x <= sightSplit; x++)
             {
-                Vector3 direction = Quaternion.Euler(new Vector3(angle * y, angle * x, 0)) * transform.forward;
+                //Vector3 direction = Quaternion.Euler(new Vector3(angle * y, angle * x, 0)) * transform.forward;
+                Vector3 direction = Quaternion.AngleAxis(angle * x, transform.right) * transform.forward;
+                direction = Quaternion.AngleAxis(angle * y, transform.up) * direction;
 
                 RaycastHit hit;
-                bool isHit = Physics.Raycast(transform.position + sightPos, direction * sightRange, out hit);
+                bool isHit = Physics.Raycast(transform.position + sightPos, direction, out hit, sightRange);
                 if (isHit) hits.Add(hit);
             }
         }
@@ -118,6 +129,7 @@ public class Enemy : Entity
                 if (!target) target = hit.transform;
                 if (target == hit.transform)
                 {
+                    Debug.Log("attack mode");
                     status = Status.Attack;
                     targetLastSeenTime = Time.time;
                     targetLastSeenPos = hit.transform.position;
@@ -195,7 +207,9 @@ public class Enemy : Entity
     {
         if (targetLastSeenTime + onGuardTime < Time.time)
         {
+            Debug.Log("return to wander");
             status = Status.Wandering;
+            target = null;
             return;
         }
 
@@ -212,7 +226,9 @@ public class Enemy : Entity
     {
         if (targetLastSeenTime + onGuardTime < Time.time)
         {
+            Debug.Log("return to wander");
             status = Status.Wandering;
+            target = null;
             return;
         }
 
@@ -225,7 +241,7 @@ public class Enemy : Entity
         }
 
         // override under here
-        if (distance > 5) {
+        if (distance > 1) {
             Vector3 lookVector = Vector3Utils.LookVector(transform.position, targetLastSeenPos);
             Move(lookVector);
         } else
