@@ -23,7 +23,7 @@ public class RaycastHitbox : MonoBehaviour
 
         foreach (HitboxHits hitbox in hitboxOpened)
         {
-            if (hitbox.EndTime < Time.time) continue;
+            if (hitbox.IsDead()) continue;
             nextHitboxOpened.Add(hitbox);
 
             List<RaycastHit> totalHits = new List<RaycastHit>();
@@ -52,6 +52,20 @@ public class RaycastHitbox : MonoBehaviour
             Vector3 oldPos = oldPoints.ContainsKey(point) ? oldPoints[point] : point.position;
             Gizmos.DrawLine(oldPos, point.position);
         }
+    }
+
+    public HitboxHits AddHitbox(string detectionTag)
+    {
+        List<string> detectionTagList = new List<string>();
+        detectionTagList.Add(detectionTag);
+        return AddHitbox(detectionTagList);
+    }
+
+    public HitboxHits AddHitbox(List<string> detectionTagList)
+    {
+        HitboxHits hitbox = new HitboxHits(detectionTagList);
+        hitboxOpened.Add(hitbox);
+        return hitbox;
     }
 
     public void AddHitbox(List<string> detectionTagList, float duration)

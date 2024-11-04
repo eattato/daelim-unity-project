@@ -6,11 +6,25 @@ public class HitboxHits
 {
     private List<string> detectionTagList;
     private List<Transform> filter;
-    private float endTime;
+    private bool died = false;
+    private bool useLifetime = true;
+    private float endTime = 0;
+
+    public bool UseLifetime
+    {
+        get { return useLifetime; }
+    }
 
     public float EndTime
     {
         get { return endTime; }
+    }
+
+    public HitboxHits(List<string> detectionTagList)
+    {
+        this.detectionTagList = detectionTagList;
+        this.filter = new List<Transform>();
+        this.useLifetime = false;
     }
 
     public HitboxHits(List<string> detectionTagList, float duration)
@@ -30,5 +44,16 @@ public class HitboxHits
             filter.Add(hit.transform);
             Debug.Log(hit.transform.gameObject.name);
         }
+    }
+
+    public bool IsDead()
+    {
+        if (useLifetime && Time.time > endTime) died = true;
+        return died;
+    }
+
+    public void KillHitbox()
+    {
+        died = true;
     }
 }

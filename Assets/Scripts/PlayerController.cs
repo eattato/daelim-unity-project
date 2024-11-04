@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PlayerController : Entity
 {
-    [Header("")]
+    [Header("傍拜 加己")]
     [SerializeField] float attackStaminaCost = 15;
 
-    [Header("")]
+    [Header("备福扁 加己")]
     [SerializeField] float rollSpeed = 10;
     [SerializeField] float rollTime = 0.5f;
     [SerializeField] float rollStunTime = 0.5f;
@@ -69,6 +69,22 @@ public class PlayerController : Entity
         {
             Quaternion lookRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+        }
+
+        animator.SetBool("walking", moveDirection.magnitude > 0);
+        if (!camController.Lockon)
+        {
+            animator.SetInteger("forward", 1);
+            animator.SetInteger("right", 0);
+        }
+        else
+        {
+            //int forwardUnit = Mathf.RoundToInt(Vector3.Dot(transform.forward, moveDirection));
+            //int rightUnit = Mathf.RoundToInt(Vector3.Dot(transform.right, moveDirection));
+            float forwardUnit = Vector3.Dot(transform.forward, moveDirection);
+            float rightUnit = Vector3.Dot(transform.right, moveDirection);
+            animator.SetFloat("forward", forwardUnit);
+            animator.SetFloat("right", rightUnit);
         }
     }
 

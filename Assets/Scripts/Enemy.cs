@@ -5,43 +5,40 @@ using UnityEngine;
 public class Enemy : Entity
 {
     [Header("배회 설정")]
-    [SerializeField] List<Transform> wanderingNodes = new List<Transform>();
-    [SerializeField] bool loopWandering = true;
-    [SerializeField] float wanderingSpeed = 5;
+    [SerializeField] protected List<Transform> wanderingNodes = new List<Transform>();
+    [SerializeField] protected bool loopWandering = true;
+    [SerializeField] protected float wanderingSpeed = 5;
 
     [Header("시야 설정")]
-    [SerializeField] float sightAngle = 120f;
-    [SerializeField] int sightSplit = 20;
-    [SerializeField] float sightRange = 20;
-    [SerializeField] Vector3 sightPos = Vector3.zero;
+    [SerializeField] protected float sightAngle = 120f;
+    [SerializeField] protected int sightSplit = 20;
+    [SerializeField] protected float sightRange = 20;
+    [SerializeField] protected Vector3 sightPos = Vector3.zero;
 
     [Header("경계 설정")]
-    [SerializeField] float detectionMult = 1; // 감지 거리 배율
-    [SerializeField] float onGuardTime = 10;
-    [SerializeField] float followDistance = 20;
+    [SerializeField] protected float detectionMult = 1; // 감지 거리 배율
+    [SerializeField] protected float onGuardTime = 10;
+    [SerializeField] protected float followDistance = 20;
 
-    [SerializeField] Transform target;
+    [SerializeField] protected Transform target;
 
-    Animator animator;
+    protected Status status = Status.Wandering;
+    protected Transform currentWanderingNode = null;
+    protected bool wanderBackwards = false;
+    protected float targetLastSeenTime = 0;
+    protected Vector3 targetLastSeenPos = Vector3.zero;
 
-    Status status = Status.Wandering;
-    Transform currentWanderingNode = null;
-    bool wanderBackwards = false;
-    float targetLastSeenTime = 0;
-    Vector3 targetLastSeenPos = Vector3.zero;
-
-    enum Status
+    protected enum Status
     {
         Wandering,
         OnGuard,
-        Attack
+        OnAttack
     }
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
-        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -57,8 +54,8 @@ public class Enemy : Entity
             case Status.OnGuard:
                 OnGuard();
                 break;
-            case Status.Attack:
-                Attack();
+            case Status.OnAttack:
+                OnAttack();
                 break;
         }
     }
@@ -66,7 +63,7 @@ public class Enemy : Entity
     void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
-        if (status == Status.Attack) return;
+        if (status == Status.OnAttack) return;
 
         float angle = sightAngle / sightSplit;
         for (int y = -sightSplit / 2; y <= sightSplit; y++)
@@ -103,6 +100,12 @@ public class Enemy : Entity
         }
     }
 
+    public override void EnableMove()
+    {
+        base.EnableMove();
+        animator.applyRootMotion = false;
+    }
+
     void DetectSight()
     {
         List<RaycastHit> hits = new List<RaycastHit>();
@@ -129,8 +132,7 @@ public class Enemy : Entity
                 if (!target) target = hit.transform;
                 if (target == hit.transform)
                 {
-                    Debug.Log("attack mode");
-                    status = Status.Attack;
+                    status = Status.OnAttack;
                     targetLastSeenTime = Time.time;
                     targetLastSeenPos = hit.transform.position;
                 }
@@ -170,7 +172,7 @@ public class Enemy : Entity
         }
     }
 
-    void Wander()
+    protected virtual void Wander()
     {
         // 감지
         DetectSight();
@@ -203,7 +205,7 @@ public class Enemy : Entity
         }
     }
 
-    void OnGuard()
+    protected virtual void OnGuard()
     {
         if (targetLastSeenTime + onGuardTime < Time.time)
         {
@@ -222,7 +224,7 @@ public class Enemy : Entity
         Move(lookVector);
     }
 
-    void Attack()
+    protected virtual void OnAttack()
     {
         if (targetLastSeenTime + onGuardTime < Time.time)
         {
@@ -232,6 +234,9 @@ public class Enemy : Entity
             return;
         }
 
+        // 감지
+        DetectSight();
+
         // pathfind and moves to last seen pos
         float distance = (transform.position - target.position).magnitude;
         if (distance <= followDistance)
@@ -239,18 +244,9 @@ public class Enemy : Entity
             targetLastSeenTime = Time.time;
             targetLastSeenPos = target.position;
         }
-
-        // override under here
-        if (distance > 1) {
-            Vector3 lookVector = Vector3Utils.LookVector(transform.position, targetLastSeenPos);
-            Move(lookVector);
-        } else
-        {
-            // attack
-        }
     }
 
-    void Move(Vector3 direction)
+    protected virtual void Move(Vector3 direction)
     {
         if (!movable) return;
 
@@ -270,7 +266,12 @@ public class Enemy : Entity
             transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
 
-        //if (moveDirection.magnitude > 0) animator.SetBool("walking", true);
-        //else animator.SetBool("walking", false);
+        animator.SetBool("walking", moveDirection.magnitude > 0);
+        animator.SetBool("sprint", status == Status.OnAttack);
+    }
+
+    protected virtual void TrackTarget()
+    {
+
     }
 }
