@@ -12,6 +12,8 @@ public class Enemy : Entity
     Transform currentWanderingNode = null;
     bool wanderBackwards = false;
 
+    Animator animator;
+
     enum Status
     {
         Wandering,
@@ -23,6 +25,7 @@ public class Enemy : Entity
     protected override void Start()
     {
         base.Start();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -45,6 +48,8 @@ public class Enemy : Entity
         }
 
         // pathfind and moves to next wandering node
+        Vector3 lookVector = Vector3Utils.LookVector(transform.position, currentWanderingNode.position);
+        Move(lookVector);
 
         if ((transform.position - currentWanderingNode.position).magnitude < 0.01f)
         {
@@ -81,5 +86,8 @@ public class Enemy : Entity
                 transform.forward, moveDirection, ref rotationVelocity, rotationSmoothTime
             );
         }
+
+        //if (moveDirection.magnitude > 0) animator.SetBool("walking", true);
+        //else animator.SetBool("walking", false);
     }
 }
