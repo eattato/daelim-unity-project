@@ -37,6 +37,12 @@ public class PlayerController : Entity
         Attack();
     }
 
+    public override void EnableMove()
+    {
+        base.EnableMove();
+        animator.applyRootMotion = false;
+    }
+
     Vector3 GetMoveDirection(bool getForward = false)
     {
         Vector3 forwardVec = Camera.main.transform.forward * Input.GetAxisRaw("Vertical");
@@ -90,25 +96,30 @@ public class PlayerController : Entity
 
     void Roll()
     {
-        if (movable && Input.GetKeyDown(KeyCode.Space) && stamina >= rollStaminaCost)
+        if (!movable || !actable) return;
+        if (Input.GetKeyDown(KeyCode.Space) && stamina >= rollStaminaCost)
         {
+            actable = false;
             movable = false;
             UseStamina(rollStaminaCost);
 
             Vector3 moveDirection = GetMoveDirection(true);
             Vector3 rollVelocity = moveDirection * rollSpeed;
             transform.forward = moveDirection;
-            thruster.AddThrust(rollVelocity, rollTime);
 
-            IEnumerator co()
-            {
-                yield return new WaitForSeconds(rollTime);
-                thruster.AddThrust(rollVelocity / 2, rollStunTime);
-                yield return new WaitForSeconds(rollStunTime);
-                movable = true;
-            }
+            animator.applyRootMotion = true;
+            animator.SetTrigger("roll");
+            //thruster.AddThrust(rollVelocity, rollTime);
 
-            StartCoroutine(co());
+            //IEnumerator co()
+            //{
+                //yield return new WaitForSeconds(rollTime);
+                //thruster.AddThrust(rollVelocity / 2, rollStunTime);
+                //yield return new WaitForSeconds(rollStunTime);
+                //movable = true;
+            //}
+
+            //StartCoroutine(co());
         }
     }
 

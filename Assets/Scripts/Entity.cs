@@ -88,6 +88,7 @@ public class Entity : MonoBehaviour
 
     public virtual void OnStun()
     {
-
+        movable = false;
+        actable = false;
     }
 }
