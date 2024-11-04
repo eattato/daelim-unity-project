@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class PlayerController : Entity
 {
+    [Header("")]
+    [SerializeField] float attackStaminaCost = 15;
+
+    [Header("")]
     [SerializeField] float rollSpeed = 10;
     [SerializeField] float rollTime = 0.5f;
     [SerializeField] float rollStunTime = 0.5f;
+    [SerializeField] float rollStaminaCost = 10;
     [SerializeField] Transform sword;
 
     Thruster thruster;
@@ -23,8 +28,10 @@ public class PlayerController : Entity
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+
         Move();
         Roll();
         Attack();
@@ -55,23 +62,22 @@ public class PlayerController : Entity
         if (camController.Lockon)
         {
             Vector3 lookVector = Vector3Utils.LookVector(camController.TrackPos, camController.Lockon.position, true);
-            transform.forward = Vector3.SmoothDamp(
-                transform.forward, lookVector, ref rotationVelocity, rotationSmoothTime
-            );
+            Quaternion lookRotation = Quaternion.LookRotation(lookVector);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
         else if (moveDirection.magnitude > 0)
         {
-            transform.forward = Vector3.SmoothDamp(
-                transform.forward, moveDirection, ref rotationVelocity, rotationSmoothTime
-            );
+            Quaternion lookRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
     }
 
     void Roll()
     {
-        if (movable && Input.GetKeyDown(KeyCode.Space))
+        if (movable && Input.GetKeyDown(KeyCode.Space) && stamina >= rollStaminaCost)
         {
             movable = false;
+            UseStamina(rollStaminaCost);
 
             Vector3 moveDirection = GetMoveDirection(true);
             Vector3 rollVelocity = moveDirection * rollSpeed;
@@ -92,9 +98,10 @@ public class PlayerController : Entity
 
     void Attack()
     {
-        if (Input.GetMouseButtonDown(0) && movable)
+        if (movable && Input.GetMouseButtonDown(0) && stamina >= attackStaminaCost)
         {
             movable = false;
+            UseStamina(attackStaminaCost);
             rigid.velocity = Vector3.zero;
 
             Vector3 moveDirection = GetMoveDirection(true);

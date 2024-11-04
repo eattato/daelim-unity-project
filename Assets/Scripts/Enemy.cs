@@ -45,8 +45,10 @@ public class Enemy : Entity
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+
         switch (status)
         {
             case Status.Wandering:
@@ -243,15 +245,13 @@ public class Enemy : Entity
         if (target)
         {
             Vector3 lookVector = Vector3Utils.LookVector(transform.position, target.position, true);
-            transform.forward = Vector3.SmoothDamp(
-                transform.forward, lookVector, ref rotationVelocity, rotationSmoothTime
-            );
+            Quaternion lookRotation = Quaternion.LookRotation(lookVector);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
         else if (moveDirection.magnitude > 0)
         {
-            transform.forward = Vector3.SmoothDamp(
-                transform.forward, moveDirection, ref rotationVelocity, rotationSmoothTime
-            );
+            Quaternion lookRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
 
         //if (moveDirection.magnitude > 0) animator.SetBool("walking", true);
