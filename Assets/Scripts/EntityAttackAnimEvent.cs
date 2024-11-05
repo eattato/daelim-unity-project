@@ -1,9 +1,17 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EntityAttackAnimEvent : StateMachineBehaviour
 {
+    private bool interrupted;
+
+    public void SetInterruptedByAnyState(bool interrupted)
+    {
+        this.interrupted = interrupted;
+        Debug.Log("interupted");
+    }
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
@@ -19,6 +27,7 @@ public class EntityAttackAnimEvent : StateMachineBehaviour
         // 모션 캔슬해야 할 시, any state로 넘어가면 발동 안하고 넘길 수 있음
         // hasExitTime on: 모션이 끝나야만 발동
         // hasExitTime off: 상태전환 이루어지면 바로 발동
+        if (interrupted) return;
         Entity entity = animator.gameObject.GetComponent<Entity>();
         entity.EnableAct();
         entity.EnableMove();

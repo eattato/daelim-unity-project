@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class TestEnemy : Enemy
@@ -31,7 +32,13 @@ public class TestEnemy : Enemy
 
     public void EnableHitbox()
     {
-        openedHitbox = hitbox.AddHitbox("Player");
+        openedHitbox = hitbox.AddHitbox("Player", OnHit);
+    }
+
+    public void OnHit(RaycastHit hit)
+    {
+        PlayerController player = hit.transform.GetComponent<PlayerController>();
+        player.OnStun();
     }
 
     // state machine

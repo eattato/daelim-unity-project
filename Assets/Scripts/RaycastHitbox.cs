@@ -1,6 +1,8 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class RaycastHitbox : MonoBehaviour
 {
@@ -54,16 +56,16 @@ public class RaycastHitbox : MonoBehaviour
         }
     }
 
-    public HitboxHits AddHitbox(string detectionTag)
+    public HitboxHits AddHitbox(string detectionTag, Action<RaycastHit> onHit = null)
     {
         List<string> detectionTagList = new List<string>();
         detectionTagList.Add(detectionTag);
-        return AddHitbox(detectionTagList);
+        return AddHitbox(detectionTagList, onHit);
     }
 
-    public HitboxHits AddHitbox(List<string> detectionTagList)
+    public HitboxHits AddHitbox(List<string> detectionTagList, Action<RaycastHit> onHit = null)
     {
-        HitboxHits hitbox = new HitboxHits(detectionTagList);
+        HitboxHits hitbox = new HitboxHits(detectionTagList, onHit);
         hitboxOpened.Add(hitbox);
         return hitbox;
     }

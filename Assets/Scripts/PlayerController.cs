@@ -39,6 +39,13 @@ public class PlayerController : Entity
         Attack();
     }
 
+    public override void OnStun()
+    {
+        base.OnStun();
+        Debug.Log("On Stun");
+        animator.SetTrigger("stun");
+    }
+
     public override void EnableMove()
     {
         base.EnableMove();
