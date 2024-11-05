@@ -19,11 +19,14 @@ public class TestEnemy : Enemy
 
 
     // state methods
-    public override void EnableAct()
+    public override void SetActable(int actable)
     {
-        base.EnableAct();
-        openedHitbox.KillHitbox();
-        openedHitbox = null;
+        base.SetActable(actable);
+        if (this.actable)
+        {
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
+        }
     }
 
     public override void OnStun()
@@ -43,6 +46,7 @@ public class TestEnemy : Enemy
     public void OnHit(RaycastHit hit) // hitbox callback
     {
         PlayerController player = hit.transform.GetComponent<PlayerController>();
+        if (player.Invincible) return;
         player.OnStun();
     }
 

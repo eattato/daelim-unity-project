@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class PlayerController : Entity
 {
+    [Header("UI 바인딩")]
+    [SerializeField] GaugeUI healthGauge;
+    [SerializeField] GaugeUI manaGauge;
+    [SerializeField] GaugeUI staminaGauge;
+
     [Header("공격 속성")]
     [SerializeField] float attackStaminaCost = 15;
 
@@ -41,6 +46,9 @@ public class PlayerController : Entity
         Roll();
         Attack();
 
+        healthGauge.SetFilled(health / maxHealth);
+        staminaGauge.SetFilled(stamina / maxStamina);
+
         AnimatorStateInfo animInfo = animator.GetCurrentAnimatorStateInfo(0);
         if (animInfo.IsName("hit"))
         {
@@ -58,14 +66,6 @@ public class PlayerController : Entity
     {
         base.OnStun();
         animator.SetTrigger("stun");
-    }
-
-    public override void EnableMove()
-    {
-        base.EnableMove();
-        //Debug.Log("move");
-        actable = true;
-        animator.applyRootMotion = false;
     }
 
 
@@ -129,6 +129,7 @@ public class PlayerController : Entity
         {
             actable = false;
             movable = false;
+            invincible = true;
             UseStamina(rollStaminaCost);
 
             Vector3 moveDirection = GetMoveDirection(true);

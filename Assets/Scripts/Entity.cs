@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +31,11 @@ public class Entity : MonoBehaviour
         set { movable = value; }
     }
 
+    public bool Invincible
+    {
+        get { return invincible; }
+    }
+
 
     // unity methods
     protected virtual void Start()
@@ -46,14 +51,21 @@ public class Entity : MonoBehaviour
 
 
     // state methods (called by animator / StateMachineBehaviour)
-    public virtual void EnableAct()
+    public virtual void SetActable(int actable)
     {
-        actable = true;
+        this.actable = actable > 0;
+        animator.applyRootMotion = !this.actable;
     }
 
-    public virtual void EnableMove()
+    public virtual void SetMovable(int movable)
     {
-        movable = true;
+        this.movable = movable > 0;
+        animator.applyRootMotion = !this.movable;
+    }
+
+    public virtual void SetInvincible(int invincible)
+    {
+        this.invincible = invincible > 0;
     }
 
     public virtual void OnStun()
@@ -73,7 +85,8 @@ public class Entity : MonoBehaviour
     
     protected virtual void RegenStamina()
     {
-        if (stamina < maxStamina && staminaLastUsed + staminaRegenDelay < Time.deltaTime)
+        if (stamina >= maxStamina) return;
+        if (staminaLastUsed + staminaRegenDelay < Time.time)
         {
             stamina += maxStamina * staminaRegen * Time.deltaTime;
             stamina = Mathf.Clamp(stamina, 0, maxStamina);

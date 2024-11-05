@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -103,11 +103,6 @@ public class Enemy : Entity
 
 
     // state methods
-    public override void EnableMove()
-    {
-        base.EnableMove();
-        animator.applyRootMotion = false;
-    }
 
 
     // utils
