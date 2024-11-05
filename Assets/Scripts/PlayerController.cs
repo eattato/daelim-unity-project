@@ -68,6 +68,17 @@ public class PlayerController : Entity
         animator.SetTrigger("stun");
     }
 
+    public override void SetActable(int actable)
+    {
+        base.SetActable(actable);
+        //Debug.Log("set actable " + this.actable);
+    }
+
+    public override void SetMovable(int movable)
+    {
+        base.SetMovable(movable);
+        //Debug.Log("set movable " + this.movable);
+    }
 
 
     // other methods
