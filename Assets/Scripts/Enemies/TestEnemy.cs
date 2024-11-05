@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +29,11 @@ public class TestEnemy : Enemy
         openedHitbox = null;
     }
 
+    public void EnableHitbox()
+    {
+        openedHitbox = hitbox.AddHitbox("Player");
+    }
+
     // state machine
     protected override void OnAttack()
     {
@@ -56,7 +61,5 @@ public class TestEnemy : Enemy
         animator.SetInteger("variant", 0);
         animator.SetTrigger("attack");
         rigid.velocity = new Vector3(0, rigid.velocity.y, 0);
-
-        openedHitbox = hitbox.AddHitbox("Player");
     }
 }
