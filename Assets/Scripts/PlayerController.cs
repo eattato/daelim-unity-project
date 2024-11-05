@@ -15,7 +15,6 @@ public class PlayerController : Entity
     [Header("구르기 속성")]
     [SerializeField] float rollSpeed = 10;
     [SerializeField] float rollTime = 0.5f;
-    [SerializeField] float rollStunTime = 0.5f;
     [SerializeField] float rollStaminaCost = 10;
     [SerializeField] Transform sword;
     [SerializeField] float walkMotionTransSpeed = 5;
@@ -147,19 +146,9 @@ public class PlayerController : Entity
             Vector3 rollVelocity = moveDirection * rollSpeed;
             transform.forward = moveDirection;
 
-            animator.applyRootMotion = true;
+            animator.applyRootMotion = false;
             animator.SetTrigger("roll");
-            //thruster.AddThrust(rollVelocity, rollTime);
-
-            //IEnumerator co()
-            //{
-                //yield return new WaitForSeconds(rollTime);
-                //thruster.AddThrust(rollVelocity / 2, rollStunTime);
-                //yield return new WaitForSeconds(rollStunTime);
-                //movable = true;
-            //}
-
-            //StartCoroutine(co());
+            thruster.AddThrust(rollVelocity, rollTime);
         }
     }
 
