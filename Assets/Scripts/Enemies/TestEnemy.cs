@@ -9,13 +9,16 @@ public class TestEnemy : Enemy
     RaycastHitbox hitbox;
     HitboxHits openedHitbox = null;
 
+
+    // unity methods
     protected override void Start()
     {
         base.Start();
         hitbox = GetComponent<RaycastHitbox>();
     }
 
-    // 히트 프레임 종료 & 스턴 시 히트박스 삭제
+
+    // state methods
     public override void EnableAct()
     {
         base.EnableAct();
@@ -35,13 +38,16 @@ public class TestEnemy : Enemy
         openedHitbox = hitbox.AddHitbox("Player", OnHit);
     }
 
-    public void OnHit(RaycastHit hit)
+
+    // other methods
+    public void OnHit(RaycastHit hit) // hitbox callback
     {
         PlayerController player = hit.transform.GetComponent<PlayerController>();
         player.OnStun();
     }
 
-    // state machine
+
+    // enemy state methods
     protected override void OnAttack()
     {
         base.OnAttack();

@@ -22,6 +22,7 @@ public class Enemy : Entity
 
     [SerializeField] protected Transform target;
 
+    // variables
     protected Status status = Status.Wandering;
     protected Transform currentWanderingNode = null;
     protected bool wanderBackwards = false;
@@ -35,13 +36,13 @@ public class Enemy : Entity
         OnAttack
     }
 
-    // Start is called before the first frame update
+    
+    // unity methods
     protected override void Start()
     {
         base.Start();
     }
 
-    // Update is called once per frame
     protected override void Update()
     {
         base.Update();
@@ -100,12 +101,16 @@ public class Enemy : Entity
         }
     }
 
+
+    // state methods
     public override void EnableMove()
     {
         base.EnableMove();
         animator.applyRootMotion = false;
     }
 
+
+    // utils
     void DetectSight()
     {
         List<RaycastHit> hits = new List<RaycastHit>();
@@ -172,6 +177,34 @@ public class Enemy : Entity
         }
     }
 
+
+    // other methods
+    protected virtual void Move(Vector3 direction)
+    {
+        if (!movable) return;
+
+        Vector3 moveDirection = Vector3.Normalize(new Vector3(direction.x, 0, direction.z));
+        float speed = status == Status.Wandering ? wanderingSpeed : moveSpeed;
+        rigid.AddForce(moveDirection * speed - rigid.velocity);
+
+        if (target)
+        {
+            Vector3 lookVector = Vector3Utils.LookVector(transform.position, target.position, true);
+            Quaternion lookRotation = Quaternion.LookRotation(lookVector);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+        }
+        else if (moveDirection.magnitude > 0)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+        }
+
+        animator.SetBool("walking", moveDirection.magnitude > 0);
+        animator.SetBool("sprint", status == Status.OnAttack);
+    }
+
+
+    // enemy state methods
     protected virtual void Wander()
     {
         // 감지
@@ -244,34 +277,5 @@ public class Enemy : Entity
             targetLastSeenTime = Time.time;
             targetLastSeenPos = target.position;
         }
-    }
-
-    protected virtual void Move(Vector3 direction)
-    {
-        if (!movable) return;
-
-        Vector3 moveDirection = Vector3.Normalize(new Vector3(direction.x, 0, direction.z));
-        float speed = status == Status.Wandering ? wanderingSpeed : moveSpeed;
-        rigid.AddForce(moveDirection * speed - rigid.velocity);
-
-        if (target)
-        {
-            Vector3 lookVector = Vector3Utils.LookVector(transform.position, target.position, true);
-            Quaternion lookRotation = Quaternion.LookRotation(lookVector);
-            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-        }
-        else if (moveDirection.magnitude > 0)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-        }
-
-        animator.SetBool("walking", moveDirection.magnitude > 0);
-        animator.SetBool("sprint", status == Status.OnAttack);
-    }
-
-    protected virtual void TrackTarget()
-    {
-
     }
 }

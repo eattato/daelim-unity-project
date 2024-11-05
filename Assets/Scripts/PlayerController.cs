@@ -15,12 +15,16 @@ public class PlayerController : Entity
     [SerializeField] Transform sword;
     [SerializeField] float walkMotionTransSpeed = 5;
 
+    // components
     Thruster thruster;
     CameraController camController;
     RaycastHitbox hitbox;
+
+    // variables
     Vector3 walkMotionTrans = Vector3.zero;
 
-    // Start is called before the first frame update
+    
+    // unity methods
     protected override void Start()
     {
         base.Start();
@@ -29,7 +33,6 @@ public class PlayerController : Entity
         hitbox = sword.GetComponent<RaycastHitbox>();
     }
 
-    // Update is called once per frame
     protected override void Update()
     {
         base.Update();
@@ -39,6 +42,8 @@ public class PlayerController : Entity
         Attack();
     }
 
+
+    // state methods
     public override void OnStun()
     {
         base.OnStun();
@@ -52,6 +57,9 @@ public class PlayerController : Entity
         animator.applyRootMotion = false;
     }
 
+
+
+    // other methods
     Vector3 GetMoveDirection(bool getForward = false)
     {
         Vector3 forwardVec = Camera.main.transform.forward * Input.GetAxisRaw("Vertical");

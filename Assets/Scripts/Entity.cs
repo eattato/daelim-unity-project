@@ -14,20 +14,25 @@ public class Entity : MonoBehaviour
     [SerializeField] protected float staminaRegen = 0.5f;
     [SerializeField] protected float staminaRegenDelay = 0.5f;
 
+    // componentes
     protected Rigidbody rigid;
     protected Animator animator;
 
+    // variables
     protected bool actable = true;
     protected bool movable = true;
     protected bool invincible = false;
     protected float staminaLastUsed = 0;
 
+    // properties
     public bool Movable
     {
         get { return movable; }
         set { movable = value; }
     }
 
+
+    // unity methods
     protected virtual void Start()
     {
         rigid = GetComponent<Rigidbody>();
@@ -39,6 +44,26 @@ public class Entity : MonoBehaviour
         RegenStamina();
     }
 
+
+    // state methods (called by animator / StateMachineBehaviour)
+    public virtual void EnableAct()
+    {
+        actable = true;
+    }
+
+    public virtual void EnableMove()
+    {
+        movable = true;
+    }
+
+    public virtual void OnStun()
+    {
+        movable = false;
+        actable = false;
+    }
+
+
+    // other methods
     protected virtual void Watch(Vector3 direction)
     {
         direction = new Vector3(direction.x, 0, direction.z).normalized;
@@ -46,7 +71,6 @@ public class Entity : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
     }
     
-    // 스태미나 관련
     protected virtual void RegenStamina()
     {
         if (stamina < maxStamina && staminaLastUsed + staminaRegenDelay < Time.deltaTime)
@@ -63,7 +87,6 @@ public class Entity : MonoBehaviour
         staminaLastUsed = Time.time;
     }
 
-    // 상태 관련
     public virtual void Damage(float amount)
     {
         health -= amount;
@@ -74,21 +97,5 @@ public class Entity : MonoBehaviour
     public virtual void Dead()
     {
         health = 0;
-    }
-
-    public virtual void EnableAct()
-    {
-        actable = true;
-    }
-
-    public virtual void EnableMove()
-    {
-        movable = true;
-    }
-
-    public virtual void OnStun()
-    {
-        movable = false;
-        actable = false;
     }
 }
