@@ -1,22 +1,24 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : Entity
 {
-    [Header("∞¯∞› º”º∫")]
+    [Header("Í≥µÍ≤© ÏÜçÏÑ±")]
     [SerializeField] float attackStaminaCost = 15;
 
-    [Header("±∏∏£±‚ º”º∫")]
+    [Header("Íµ¨Î•¥Í∏∞ ÏÜçÏÑ±")]
     [SerializeField] float rollSpeed = 10;
     [SerializeField] float rollTime = 0.5f;
     [SerializeField] float rollStunTime = 0.5f;
     [SerializeField] float rollStaminaCost = 10;
     [SerializeField] Transform sword;
+    [SerializeField] float walkMotionTransSpeed = 5;
 
     Thruster thruster;
     CameraController camController;
     RaycastHitbox hitbox;
+    Vector3 walkMotionTrans = Vector3.zero;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -85,12 +87,12 @@ public class PlayerController : Entity
         }
         else
         {
-            //int forwardUnit = Mathf.RoundToInt(Vector3.Dot(transform.forward, moveDirection));
-            //int rightUnit = Mathf.RoundToInt(Vector3.Dot(transform.right, moveDirection));
             float forwardUnit = Vector3.Dot(transform.forward, moveDirection);
             float rightUnit = Vector3.Dot(transform.right, moveDirection);
-            animator.SetFloat("forward", forwardUnit);
-            animator.SetFloat("right", rightUnit);
+
+            walkMotionTrans = Vector3.Lerp(walkMotionTrans, new Vector3(rightUnit, 0, forwardUnit), Time.deltaTime * walkMotionTransSpeed);
+            animator.SetFloat("forward", walkMotionTrans.z);
+            animator.SetFloat("right", walkMotionTrans.x);
         }
     }
 

@@ -1,22 +1,22 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : Entity
 {
-    [Header("¹èÈ¸ ¼³Á¤")]
+    [Header("ë°°íšŒ ì„¤ì •")]
     [SerializeField] protected List<Transform> wanderingNodes = new List<Transform>();
     [SerializeField] protected bool loopWandering = true;
     [SerializeField] protected float wanderingSpeed = 5;
 
-    [Header("½Ã¾ß ¼³Á¤")]
+    [Header("ì‹œì•¼ ì„¤ì •")]
     [SerializeField] protected float sightAngle = 120f;
     [SerializeField] protected int sightSplit = 20;
     [SerializeField] protected float sightRange = 20;
     [SerializeField] protected Vector3 sightPos = Vector3.zero;
 
-    [Header("°æ°è ¼³Á¤")]
-    [SerializeField] protected float detectionMult = 1; // °¨Áö °Å¸® ¹èÀ²
+    [Header("ê²½ê³„ ì„¤ì •")]
+    [SerializeField] protected float detectionMult = 1; // ê°ì§€ ê±°ë¦¬ ë°°ìœ¨
     [SerializeField] protected float onGuardTime = 10;
     [SerializeField] protected float followDistance = 20;
 
@@ -174,12 +174,12 @@ public class Enemy : Entity
 
     protected virtual void Wander()
     {
-        // °¨Áö
+        // ê°ì§€
         DetectSight();
         DetectSound();
         if (status != Status.Wandering) return;
 
-        // ÀÌµ¿
+        // ì´ë™
         if (wanderingNodes.Count == 0) return;
         if (currentWanderingNode == null)
         {
@@ -215,7 +215,7 @@ public class Enemy : Entity
             return;
         }
 
-        // °¨Áö
+        // ê°ì§€
         DetectSight();
         DetectSound();
 
@@ -234,7 +234,7 @@ public class Enemy : Entity
             return;
         }
 
-        // °¨Áö
+        // ê°ì§€
         DetectSight();
 
         // pathfind and moves to last seen pos

@@ -1,10 +1,10 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
-    [Header("¿£Æ¼Æ¼ ¼³Á¤")]
+    [Header("ì—”í‹°í‹° ì„¤ì •")]
     [SerializeField] protected float maxHealth = 100;
     [SerializeField] protected float health = 100;
     [SerializeField] protected float moveSpeed = 7;
@@ -46,7 +46,7 @@ public class Entity : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
     }
     
-    // ½ºÅÂ¹Ì³ª °ü·Ã
+    // ìŠ¤íƒœë¯¸ë‚˜ ê´€ë ¨
     protected virtual void RegenStamina()
     {
         if (stamina < maxStamina && staminaLastUsed + staminaRegenDelay < Time.deltaTime)
@@ -63,7 +63,7 @@ public class Entity : MonoBehaviour
         staminaLastUsed = Time.time;
     }
 
-    // »óÅÂ °ü·Ã
+    // ìƒíƒœ ê´€ë ¨
     public virtual void Damage(float amount)
     {
         health -= amount;

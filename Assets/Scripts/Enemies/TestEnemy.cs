@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ public class TestEnemy : Enemy
         hitbox = GetComponent<RaycastHitbox>();
     }
 
-    // È÷Æ® ÇÁ·¹ÀÓ Á¾·á & ½ºÅÏ ½Ã È÷Æ®¹Ú½º »èÁ¦
+    // ížˆíŠ¸ í”„ë ˆìž„ ì¢…ë£Œ & ìŠ¤í„´ ì‹œ ížˆíŠ¸ë°•ìŠ¤ ì‚­ì œ
     public override void EnableAct()
     {
         base.EnableAct();
