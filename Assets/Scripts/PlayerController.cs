@@ -40,6 +40,16 @@ public class PlayerController : Entity
         Move();
         Roll();
         Attack();
+
+        AnimatorStateInfo animInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (animInfo.IsName("hit"))
+        {
+            //Debug.Log(animInfo.normalizedTime);
+            if (animInfo.normalizedTime >= 1)
+            {
+                //EnableMove();
+            }
+        }
     }
 
 
@@ -47,13 +57,14 @@ public class PlayerController : Entity
     public override void OnStun()
     {
         base.OnStun();
-        Debug.Log("On Stun");
         animator.SetTrigger("stun");
     }
 
     public override void EnableMove()
     {
         base.EnableMove();
+        //Debug.Log("move");
+        actable = true;
         animator.applyRootMotion = false;
     }
 
