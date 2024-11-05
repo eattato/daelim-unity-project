@@ -1,0 +1,25 @@
+애니메이션 관련
+
+mixamo 애니메이션 팩
+https://www.mixamo.com/#/?page=1&query=idle&type=Motion%2CMotionPack
+
+y bot 기본 모델링
+https://sketchfab.com/3d-models/y-bot-from-mixamo-f114e5b0bd2141119544756530560e48#download
+
+root 애니메이션 전환(mixamo꺼엔 적용해야 안 움직임)
+https://www.youtube.com/watch?v=Xl_5roq4UlI
+
+read only 애니메이션 수정
+애니메이션 찾아가서 CTRL D하면 복제되는데 복제된거 쓰면됨
+
+root 애니메이션이 붕쯔붕쯔거리거나 날라다님
+해당 애니메이션의 Root Transform Rotation, Root Transform Position(Y) 밑의 Bake Into Pose 체크하면됨
+
+root 애니메이션이 재생 시작할때 갑자기 텔포됨
+Animator에서 Update Mode를 Animate Physcis로 설정하면 고쳐짐
+
+끝에 배치한 애니메이션 이벤트가 발동이 안됨
+HasExitTime 1로 설정해야 끝까지 재생됨, 기준이 초 아니고 재생 비율이라 1임
+
+Any State로 캔슬하고 재생하는데 이벤트가 겹쳐서 실행됨(스턴 풀리면서 다시 걸리면 스턴모션인데 이동이 되는경우)
+트랜지션 때문에 두 모션 이벤트가 전부 실행되는거, Any State에 연결된 모션은 Transition을 0으로 맞춰놔야함
