@@ -6574,7 +6574,7 @@ MonoBehaviour:
   healthGauge: {fileID: 2005970825}
   manaGauge: {fileID: 1158510822}
   staminaGauge: {fileID: 1213936001}
-  titleUI: {fileID: 0}
+  titleUI: {fileID: 1369046789}
   attackStaminaCost: 15
   rollSpeed: 8
   rollTime: 0.45

@@ -61,7 +61,7 @@ public class TitleUI : MonoBehaviour
 
         if (current == null && queue.Count > 0)
         {
-            titleDuration += titleTime;
+            titleDuration = Time.time + titleTime;
             current = queue.Dequeue();
             current.Apply(titleText);
 
@@ -94,6 +94,8 @@ public class TitleUI : MonoBehaviour
             titleBG.color = new Color(1, 1, 1, bgTransparency);
             titleText.color = new Color(titleText.color.r, titleText.color.g, titleText.color.b, 1);
         }
+
+        titleText.fontSize = current.FontSize * 0.8f + current.FontSize * 0.2f * percent;
     }
 
     public void AddTitle(string text, Color color, int fontSize = 72, int spacing = 0)

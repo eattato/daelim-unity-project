@@ -10,6 +10,26 @@ public class TitleData
     int fontSize;
     int spacing;
 
+    public string Text
+    {
+        get { return text; }
+    }
+
+    public Color TextColor
+    {
+        get { return color; }
+    }
+
+    public int FontSize
+    {
+        get { return fontSize; }
+    }
+
+    public int Spacing
+    {
+        get { return spacing; }
+    }
+
     public TitleData(string text, Color color, int fontSize, int spacing)
     {
         this.text = text;

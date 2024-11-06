@@ -104,9 +104,7 @@ public class PlayerController : Entity
     public override void Dead()
     {
         base.Dead();
-        actable = false;
-        movable = false;
-        invincible = true;
+        animator.SetTrigger("died");
 
         IEnumerator co()
         {

@@ -22,6 +22,7 @@ public class Entity : MonoBehaviour
     protected bool actable = true;
     protected bool movable = true;
     protected bool invincible = false;
+    protected bool died = false;
     protected float staminaLastUsed = 0;
     protected float superArmorTime = 0;
 
@@ -40,6 +41,11 @@ public class Entity : MonoBehaviour
     public bool SuperArmor
     {
         get { return superArmorTime >= Time.time; }
+    }
+
+    public bool Died
+    { 
+        get { return died; }
     }
 
 
@@ -110,6 +116,11 @@ public class Entity : MonoBehaviour
     public virtual void Dead()
     {
         health = 0;
+        actable = false;
+        movable = false;
+        invincible = true;
+        died = true;
+        gameObject.layer = 6; // Ghost entity
     }
 
     public virtual bool Stun(float stunDuration = 0)

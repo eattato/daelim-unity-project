@@ -30,4 +30,14 @@ public class Pushblocker : MonoBehaviour
             Physics.IgnoreCollision(collider, otherCollider);
         }
     }
+
+    void Update()
+    {
+        // ghost entity가 되면 콜라이더 끔
+        if (transform.parent.gameObject.layer == 6)
+        {
+            Collider collider = GetComponent<Collider>();
+            collider.isTrigger = true;
+        }
+    }
 }

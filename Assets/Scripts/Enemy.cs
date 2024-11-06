@@ -127,6 +127,10 @@ public class Enemy : Entity
 
         foreach (RaycastHit hit in hits)
         {
+            Entity targetEntity = hit.transform.GetComponent<Entity>();
+            if (targetEntity == null) continue;
+            if (targetEntity.Died) continue;
+
             if (hit.transform.gameObject.tag == "Player")
             {
                 if (!target) target = hit.transform;
@@ -254,7 +258,11 @@ public class Enemy : Entity
 
     protected virtual void OnAttack()
     {
-        if (targetLastSeenTime + onGuardTime < Time.time)
+        Entity targetEntity = target.GetComponent<Entity>();
+        bool noTarget = target == null;
+        bool targetLost = targetLastSeenTime + onGuardTime < Time.time;
+
+        if (noTarget || targetLost || targetEntity.Died)
         {
             Debug.Log("return to wander");
             status = Status.Wandering;

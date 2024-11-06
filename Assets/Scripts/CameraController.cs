@@ -83,7 +83,9 @@ public class CameraController : MonoBehaviour
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemies.Length == 0) return;
 
-        lockon = enemies[0].transform;
+        lockon = enemies[0].transform.Find("lockon");
+        lockon = lockon ? lockon : enemies[0].transform;
+
         foreach (GameObject enemy in enemies)
         {
             Transform lockTransform = enemy.transform.Find("lockon");
@@ -104,7 +106,6 @@ public class CameraController : MonoBehaviour
 
         if (lockon)
         {
-            Debug.Log(lockon);
             lockonUi.gameObject.SetActive(true);
         }
     }
