@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class CameraController : MonoBehaviour
 {
     
-    [Header("±âº» ¼³Á¤")]
+    [Header("ê¸°ë³¸ ì„¤ì •")]
     [SerializeField] Transform camTarget;
     [SerializeField] Vector3 camOffset = Vector3.zero;
     [SerializeField] float camDistance = 3;
     [SerializeField] float camSensitivity = 1f;
 
-    [Header("¶ô¿Â ¼³Á¤")]
+    [Header("ë½ì˜¨ ì„¤ì •")]
     [SerializeField] RectTransform lockonUi;
     [SerializeField] float lookSmoothTime = 0.01f;
     [SerializeField] float lockonMaxDistance = 30f;
@@ -70,40 +70,41 @@ public class CameraController : MonoBehaviour
 
     void CheckLockon()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (!Input.GetKeyDown(KeyCode.Q)) return;
+
+        if (lockon)
         {
-            if (lockon)
+            lockon = null;
+            lockonUi.gameObject.SetActive(false);
+            return;
+        }
+
+        // ë½ì˜¨ ëŒ€ìƒ ì§€ì •
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        if (enemies.Length == 0) return;
+
+        lockon = enemies[0].transform;
+        foreach (GameObject enemy in enemies)
+        {
+            Transform lockTransform = enemy.transform.Find("lockon");
+            lockTransform = lockTransform ? lockTransform : enemy.transform;
+
+            Vector3 oldLookVector = (lockon.position - transform.position).normalized;
+            Vector3 currentLookVector = (lockTransform.position - transform.position).normalized;
+
+            float oldUnit = Vector3.Dot(transform.forward, oldLookVector);
+            float currentUnit = Vector3.Dot(transform.forward, currentLookVector);
+
+            // ì¼ì¹˜í• ìˆ˜ë¡ 1, ë°˜ëŒ€ì¼ìˆ˜ë¡ -1
+            if (currentUnit > oldUnit)
             {
-                lockon = null;
-                lockonUi.gameObject.SetActive(false);
+                lockon = lockTransform;
             }
-            else
-            {
-                GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-                if (enemies.Length == 0) return;
+        }
 
-                lockon = enemies[0].transform;
-                foreach (GameObject enemy in enemies)
-                {
-                    Vector3 oldOffset = lockon.position - transform.position;
-                    Vector3 currentOffset = enemy.transform.position - transform.position;
-                    float oldUnit = Vector3.Dot(transform.forward, Vector3.Normalize(oldOffset));
-                    float currentUnit = Vector3.Dot(transform.forward, Vector3.Normalize(currentOffset));
-
-                    oldUnit = oldOffset.magnitude * oldUnit;
-                    currentUnit = currentOffset.magnitude * currentUnit;
-
-                    if (currentUnit < oldUnit)
-                    {
-                        lockon = enemy.transform;
-                    }
-                }
-
-                if (lockon)
-                {
-                    lockonUi.gameObject.SetActive(true);
-                }
-            }
+        if (lockon)
+        {
+            lockonUi.gameObject.SetActive(true);
         }
     }
 }

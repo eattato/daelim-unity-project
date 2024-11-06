@@ -51,7 +51,7 @@ public class TestEnemy : Enemy
         PlayerController player = hit.transform.GetComponent<PlayerController>();
         if (player.Invincible) return;
         player.Damage(30);
-        player.Stun(1.45f); // 두 대 맞으면 둘다 동시에 행동 가능하게
+        player.Stun(1.25f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간 반절까지 스턴
     }
 
 
@@ -72,6 +72,7 @@ public class TestEnemy : Enemy
 
     void Attack(Vector3 lookVector)
     {
+        rigid.velocity = new Vector3(0, rigid.velocity.y, 0);
         if (!actable) return;
 
         actable = false;
@@ -81,6 +82,5 @@ public class TestEnemy : Enemy
 
         animator.SetInteger("variant", 0);
         animator.SetTrigger("attack");
-        rigid.velocity = new Vector3(0, rigid.velocity.y, 0);
     }
 }
