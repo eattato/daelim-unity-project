@@ -25,6 +25,7 @@ public class Entity : MonoBehaviour
     protected bool died = false;
     protected float staminaLastUsed = 0;
     protected float superArmorTime = 0;
+    protected float superArmorDurability = 0;
 
     // properties
     public bool Movable
@@ -46,6 +47,11 @@ public class Entity : MonoBehaviour
     public bool Died
     { 
         get { return died; }
+    }
+
+    public float SuperArmorDurability
+    {
+        get { return superArmorDurability; }
     }
 
 
@@ -78,6 +84,13 @@ public class Entity : MonoBehaviour
     public virtual void SetInvincible(int invincible)
     {
         this.invincible = invincible > 0;
+    }
+
+    public virtual void SetSuperArmor(int superArmor)
+    {
+        // 0이면 슈퍼아머 삭제, 그 이상이면 해당 초 만큼 슈퍼아머 생성
+        // 보통은 애니메이션 이벤트에서 삭제로만 씀
+        this.superArmorTime = superArmor == 0 ? 0 : superArmor;
     }
 
 
@@ -125,7 +138,9 @@ public class Entity : MonoBehaviour
 
     public virtual bool Stun(float stunDuration = 0)
     {
-        if (SuperArmor) return false;
+        // 피격됐을때 슈퍼아머가 없거나 강인도가 약하면 깨져서 갱신됨
+        if (SuperArmor && superArmorDurability >= stunDuration) return false;
+        this.superArmorDurability = 999; // 스턴먹어서 생긴 슈퍼아머는 안 깨짐, 깨지면 무한스턴 되버림
         this.superArmorTime = Time.time + stunDuration;
 
         movable = false;

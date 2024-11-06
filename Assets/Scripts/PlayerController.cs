@@ -79,7 +79,6 @@ public class PlayerController : Entity
         bool applied = base.Stun(stunDuration);
         if (!applied)
         {
-            Debug.Log("hurt");
             animator.SetTrigger("hurt");
             return applied;
         }

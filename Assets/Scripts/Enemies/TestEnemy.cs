@@ -80,6 +80,9 @@ public class TestEnemy : Enemy
         lockRotation = lookVector;
         animator.applyRootMotion = true;
 
+        superArmorDurability = 1.2f; // 강인도 설정, 공격 중엔 1.2초 짜리 스턴 버틸 수 있음
+        superArmorTime = Time.time + 10; // 그냥 10초로 뒀다가 애니메이션 이벤트로 지울 예정
+
         animator.SetInteger("variant", 0);
         animator.SetTrigger("attack");
     }
