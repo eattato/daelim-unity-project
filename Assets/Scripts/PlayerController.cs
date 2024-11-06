@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : Entity
 {
@@ -105,8 +106,17 @@ public class PlayerController : Entity
         base.Dead();
         actable = false;
         movable = false;
+        invincible = true;
 
+        IEnumerator co()
+        {
+            yield return new WaitForSeconds(3);
+            titleUI.AddTitle(titleUI.DeadLine, titleUI.DeadColor);
+            yield return new WaitForSeconds(7);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
 
+        StartCoroutine(co());
     }
 
 
