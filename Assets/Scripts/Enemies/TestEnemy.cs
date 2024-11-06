@@ -22,18 +22,21 @@ public class TestEnemy : Enemy
     public override void SetActable(int actable)
     {
         base.SetActable(actable);
-        if (this.actable)
+        if (this.actable) // 재행동 가능 = 이전 행동 끝남, 이전 히트박스를 끝냄
         {
             openedHitbox.KillHitbox();
             openedHitbox = null;
         }
     }
 
-    public override void OnStun()
+    public override bool Stun(float stunDuration = 0)
     {
-        base.OnStun();
+        bool applied = base.Stun(stunDuration);
+        if (!applied) return applied;
+
         openedHitbox.KillHitbox();
         openedHitbox = null;
+        return applied;
     }
 
     public void EnableHitbox()
@@ -47,7 +50,8 @@ public class TestEnemy : Enemy
     {
         PlayerController player = hit.transform.GetComponent<PlayerController>();
         if (player.Invincible) return;
-        player.OnStun();
+        player.Damage(30);
+        player.Stun(1.45f); // 두 대 맞으면 둘다 동시에 행동 가능하게
     }
 
 

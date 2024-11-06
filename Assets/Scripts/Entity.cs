@@ -23,6 +23,7 @@ public class Entity : MonoBehaviour
     protected bool movable = true;
     protected bool invincible = false;
     protected float staminaLastUsed = 0;
+    protected float superArmorTime = 0;
 
     // properties
     public bool Movable
@@ -34,6 +35,11 @@ public class Entity : MonoBehaviour
     public bool Invincible
     {
         get { return invincible; }
+    }
+
+    public bool SuperArmor
+    {
+        get { return superArmorTime >= Time.time; }
     }
 
 
@@ -66,12 +72,6 @@ public class Entity : MonoBehaviour
     public virtual void SetInvincible(int invincible)
     {
         this.invincible = invincible > 0;
-    }
-
-    public virtual void OnStun()
-    {
-        movable = false;
-        actable = false;
     }
 
 
@@ -110,5 +110,15 @@ public class Entity : MonoBehaviour
     public virtual void Dead()
     {
         health = 0;
+    }
+
+    public virtual bool Stun(float stunDuration = 0)
+    {
+        if (SuperArmor) return false;
+        this.superArmorTime = Time.time + stunDuration;
+
+        movable = false;
+        actable = false;
+        return true;
     }
 }

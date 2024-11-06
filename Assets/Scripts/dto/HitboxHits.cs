@@ -60,4 +60,9 @@ public class HitboxHits
     {
         died = true;
     }
+
+    public void SetOnHit(Action<RaycastHit> onHit)
+    {
+        this.onHit = onHit;
+    }
 }

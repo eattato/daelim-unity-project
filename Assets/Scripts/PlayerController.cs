@@ -26,6 +26,7 @@ public class PlayerController : Entity
 
     // variables
     Vector3 walkMotionTrans = Vector3.zero;
+    AnimationClip rollMotion;
 
     
     // unity methods
@@ -35,6 +36,16 @@ public class PlayerController : Entity
         thruster = GetComponent<Thruster>();
         camController = Camera.main.GetComponent<CameraController>();
         hitbox = sword.GetComponent<RaycastHitbox>();
+
+        AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+        foreach (AnimationClip clip in clips)
+        {
+            if (clip.name == "Stand To Roll")
+            {
+                rollMotion = clip;
+                break;
+            }
+        }
     }
 
     protected override void Update()
@@ -61,10 +72,19 @@ public class PlayerController : Entity
 
 
     // state methods
-    public override void OnStun()
+    public override bool Stun(float stunDuration = 0)
     {
-        base.OnStun();
+        bool applied = base.Stun(stunDuration);
+        if (!applied) return applied;
+
+        if (rollMotion)
+        {
+            float speed = rollMotion.length / stunDuration;
+            animator.SetFloat("hurtSpeed", speed);
+        }
+
         animator.SetTrigger("stun");
+        return applied;
     }
 
     public override void SetActable(int actable)
