@@ -13,6 +13,7 @@ public class Entity : MonoBehaviour
     [SerializeField] protected float stamina = 100;
     [SerializeField] protected float staminaRegen = 0.5f;
     [SerializeField] protected float staminaRegenDelay = 0.5f;
+    [SerializeField] protected float defaultSuperArmor = 0;
 
     // componentes
     protected Rigidbody rigid;
@@ -139,7 +140,8 @@ public class Entity : MonoBehaviour
     public virtual bool Stun(float stunDuration = 0)
     {
         // 피격됐을때 슈퍼아머가 없거나 강인도가 약하면 깨져서 갱신됨
-        if (SuperArmor && superArmorDurability >= stunDuration) return false;
+        if (!SuperArmor && defaultSuperArmor >= stunDuration) return false; // 상시적용 슈퍼아머
+        if (SuperArmor && Mathf.Max(superArmorDurability, defaultSuperArmor) >= stunDuration) return false;
         this.superArmorDurability = 999; // 스턴먹어서 생긴 슈퍼아머는 안 깨짐, 깨지면 무한스턴 되버림
         this.superArmorTime = Time.time + stunDuration;
 
