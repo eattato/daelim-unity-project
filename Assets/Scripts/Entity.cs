@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.Animations;
 
 public class Entity : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class Entity : MonoBehaviour
     [SerializeField] protected float staminaRegenDelay = 0.5f;
     [SerializeField] protected float defaultSuperArmor = 0;
 
+    [Header("모션 설정")]
+    [SerializeField] protected AnimationClip stunMotion;
+
     // componentes
     protected Rigidbody rigid;
     protected Animator animator;
@@ -27,6 +31,7 @@ public class Entity : MonoBehaviour
     protected float staminaLastUsed = 0;
     protected float superArmorTime = 0;
     protected float superArmorDurability = 0;
+    protected bool parrying = false;
 
     // properties
     public bool Movable
@@ -53,6 +58,11 @@ public class Entity : MonoBehaviour
     public float SuperArmorDurability
     {
         get { return superArmorDurability; }
+    }
+
+    public bool Parrying
+    {
+        get { return parrying; }
     }
 
 
@@ -92,6 +102,11 @@ public class Entity : MonoBehaviour
         // 0이면 슈퍼아머 삭제, 그 이상이면 해당 초 만큼 슈퍼아머 생성
         // 보통은 애니메이션 이벤트에서 삭제로만 씀
         this.superArmorTime = superArmor == 0 ? 0 : superArmor;
+    }
+
+    public virtual void SetParrying(int parrying)
+    {
+        this.parrying = parrying > 0;
     }
 
 
@@ -140,13 +155,31 @@ public class Entity : MonoBehaviour
     public virtual bool Stun(float stunDuration = 0)
     {
         // 피격됐을때 슈퍼아머가 없거나 강인도가 약하면 깨져서 갱신됨
-        if (!SuperArmor && defaultSuperArmor >= stunDuration) return false; // 상시적용 슈퍼아머
-        if (SuperArmor && Mathf.Max(superArmorDurability, defaultSuperArmor) >= stunDuration) return false;
+        bool stunned = true;
+        if (!SuperArmor && defaultSuperArmor >= stunDuration) stunned = false; // 상시적용 슈퍼아머
+        if (SuperArmor && Mathf.Max(superArmorDurability, defaultSuperArmor) >= stunDuration) stunned = false;
+
+        if (!stunned)
+        {
+            try
+            {
+                animator.SetTrigger("hurt");
+            } catch { }
+            return stunned;
+        }
+
         this.superArmorDurability = 999; // 스턴먹어서 생긴 슈퍼아머는 안 깨짐, 깨지면 무한스턴 되버림
         this.superArmorTime = Time.time + stunDuration;
 
         movable = false;
         actable = false;
+
+        try
+        {
+            float speed = stunMotion.length / stunDuration;
+            animator.SetFloat("stunSpeed", speed);
+            animator.SetTrigger("stun");
+        } catch { }
         return true;
     }
 }

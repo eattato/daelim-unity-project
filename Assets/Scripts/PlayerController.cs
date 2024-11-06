@@ -28,9 +28,10 @@ public class PlayerController : Entity
 
     // variables
     Vector3 walkMotionTrans = Vector3.zero;
-    AnimationClip hurtMotion;
+    Vector3 lockRotation = Vector3.zero;
+    HitboxHits openedHitbox = null;
 
-    
+
     // unity methods
     protected override void Start()
     {
@@ -38,16 +39,6 @@ public class PlayerController : Entity
         thruster = GetComponent<Thruster>();
         camController = Camera.main.GetComponent<CameraController>();
         hitbox = sword.GetComponent<RaycastHitbox>();
-
-        AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
-        foreach (AnimationClip clip in clips)
-        {
-            if (clip.name == "hit")
-            {
-                hurtMotion = clip;
-                break;
-            }
-        }
     }
 
     protected override void Update()
@@ -56,7 +47,8 @@ public class PlayerController : Entity
 
         Move();
         Roll();
-        Attack();
+        Attack(transform.forward);
+        Parry();
 
         healthGauge.SetFilled(health / maxHealth);
         staminaGauge.SetFilled(stamina / maxStamina);
@@ -77,26 +69,26 @@ public class PlayerController : Entity
     public override bool Stun(float stunDuration = 0)
     {
         bool applied = base.Stun(stunDuration);
-        if (!applied)
+        if (!applied) return applied;
+
+        if (openedHitbox != null)
         {
-            animator.SetTrigger("hurt");
-            return applied;
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
         }
 
-        if (hurtMotion)
-        {
-            float speed = hurtMotion.length / stunDuration;
-            animator.SetFloat("hurtSpeed", speed);
-        }
-
-        animator.SetTrigger("stun");
         return applied;
     }
 
     public override void SetActable(int actable)
     {
         base.SetActable(actable);
-        //Debug.Log("set actable " + this.actable);
+        if (!this.actable) return;
+        if (openedHitbox != null)
+        {
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
+        }
     }
 
     public override void SetMovable(int movable)
@@ -121,6 +113,30 @@ public class PlayerController : Entity
         StartCoroutine(co());
     }
 
+    void Attack(Vector3 lookVector)
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        rigid.velocity = new Vector3(0, rigid.velocity.y, 0);
+        if (!actable) return;
+
+        actable = false;
+        movable = false;
+        lockRotation = lookVector;
+        animator.applyRootMotion = true;
+
+        superArmorDurability = 0.5f;
+        superArmorTime = Time.time + 10;
+
+        //animator.SetInteger("variant", 0);
+        animator.SetTrigger("attack");
+    }
+
+    public void EnableHitbox()
+    {
+        openedHitbox = hitbox.AddHitbox("Enemy", OnHit);
+    }
+
 
     // other methods
     Vector3 GetMoveDirection(bool getForward = false)
@@ -136,6 +152,14 @@ public class PlayerController : Entity
             moveDirection = transform.forward;
         }
         return moveDirection;
+    }
+
+    public void OnHit(RaycastHit hit) // hitbox callback
+    {
+        Enemy enemy = hit.transform.GetComponent<Enemy>();
+        if (enemy.Invincible) return;
+        enemy.Damage(20);
+        enemy.Stun(0.5f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
 
     void Move()
@@ -194,29 +218,20 @@ public class PlayerController : Entity
         }
     }
 
-    void Attack()
+    void Parry()
     {
-        if (movable && Input.GetMouseButtonDown(0) && stamina >= attackStaminaCost)
+        if (!movable || !actable) return;
+        if (Input.GetKeyDown(KeyCode.LeftControl))
         {
+            actable = false;
             movable = false;
-            UseStamina(attackStaminaCost);
-            rigid.velocity = Vector3.zero;
 
             Vector3 moveDirection = GetMoveDirection(true);
-            //transform.forward = moveDirection;
-            thruster.AddThrust(moveDirection * 5, 1);
+            Vector3 rollVelocity = moveDirection * rollSpeed;
+            transform.forward = moveDirection;
 
-            List<string> detectionTagList = new List<string>();
-            detectionTagList.Add("Enemy");
-            hitbox.AddHitbox(detectionTagList, 0.5f);
-
-            IEnumerator co()
-            {
-                yield return new WaitForSeconds(0.5f);
-                movable = true;
-            }
-
-            StartCoroutine(co());
+            animator.applyRootMotion = false;
+            animator.SetTrigger("parry");
         }
     }
 }

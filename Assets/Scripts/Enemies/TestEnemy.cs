@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 
 public class TestEnemy : Enemy
@@ -22,7 +21,10 @@ public class TestEnemy : Enemy
     public override void SetActable(int actable)
     {
         base.SetActable(actable);
-        if (this.actable) // 재행동 가능 = 이전 행동 끝남, 이전 히트박스를 끝냄
+        if (!this.actable) return;
+
+        // 재행동 가능 = 이전 행동 끝남, 이전 히트박스를 끝냄
+        if (openedHitbox != null) 
         {
             openedHitbox.KillHitbox();
             openedHitbox = null;
@@ -34,8 +36,11 @@ public class TestEnemy : Enemy
         bool applied = base.Stun(stunDuration);
         if (!applied) return applied;
 
-        openedHitbox.KillHitbox();
-        openedHitbox = null;
+        if (openedHitbox != null)
+        {
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
+        }
         return applied;
     }
 
@@ -44,12 +49,36 @@ public class TestEnemy : Enemy
         openedHitbox = hitbox.AddHitbox("Player", OnHit);
     }
 
+    public void DisableHitbox()
+    {
+        if (openedHitbox != null)
+        {
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
+        }
+    }
+
 
     // other methods
     public void OnHit(RaycastHit hit) // hitbox callback
     {
         PlayerController player = hit.transform.GetComponent<PlayerController>();
         if (player.Invincible) return;
+        if (player.Parrying)
+        {
+            movable = false;
+            actable = false;
+            if (openedHitbox != null)
+            {
+                openedHitbox.KillHitbox();
+                openedHitbox = null;
+            }
+
+            animator.SetTrigger("stun");
+            animator.SetFloat("stunSpeed", 1);
+            return;
+        }
+
         player.Damage(30);
         player.Stun(1.45f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
@@ -83,7 +112,7 @@ public class TestEnemy : Enemy
         superArmorDurability = 1.2f; // 강인도 설정, 공격 중엔 1.2초 짜리 스턴 버틸 수 있음
         superArmorTime = Time.time + 10; // 그냥 10초로 뒀다가 애니메이션 이벤트로 지울 예정
 
-        animator.SetInteger("variant", 0);
+        animator.SetInteger("variant", Random.Range(0, 2));
         animator.SetTrigger("attack");
     }
 }
