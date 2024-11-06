@@ -104,6 +104,7 @@ public class CameraController : MonoBehaviour
 
         if (lockon)
         {
+            Debug.Log(lockon);
             lockonUi.gameObject.SetActive(true);
         }
     }

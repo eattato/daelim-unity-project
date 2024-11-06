@@ -8,6 +8,7 @@ public class PlayerController : Entity
     [SerializeField] GaugeUI healthGauge;
     [SerializeField] GaugeUI manaGauge;
     [SerializeField] GaugeUI staminaGauge;
+    [SerializeField] TitleUI titleUI;
 
     [Header("공격 속성")]
     [SerializeField] float attackStaminaCost = 15;
@@ -26,7 +27,7 @@ public class PlayerController : Entity
 
     // variables
     Vector3 walkMotionTrans = Vector3.zero;
-    AnimationClip rollMotion;
+    AnimationClip hurtMotion;
 
     
     // unity methods
@@ -40,9 +41,9 @@ public class PlayerController : Entity
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
         foreach (AnimationClip clip in clips)
         {
-            if (clip.name == "Stand To Roll")
+            if (clip.name == "hit")
             {
-                rollMotion = clip;
+                hurtMotion = clip;
                 break;
             }
         }
@@ -77,9 +78,9 @@ public class PlayerController : Entity
         bool applied = base.Stun(stunDuration);
         if (!applied) return applied;
 
-        if (rollMotion)
+        if (hurtMotion)
         {
-            float speed = rollMotion.length / stunDuration;
+            float speed = hurtMotion.length / stunDuration;
             animator.SetFloat("hurtSpeed", speed);
         }
 
@@ -97,6 +98,15 @@ public class PlayerController : Entity
     {
         base.SetMovable(movable);
         //Debug.Log("set movable " + this.movable);
+    }
+
+    public override void Dead()
+    {
+        base.Dead();
+        actable = false;
+        movable = false;
+
+
     }
 
 
