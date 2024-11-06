@@ -51,7 +51,7 @@ public class TestEnemy : Enemy
         PlayerController player = hit.transform.GetComponent<PlayerController>();
         if (player.Invincible) return;
         player.Damage(30);
-        player.Stun(1.25f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간 반절까지 스턴
+        player.Stun(1.45f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
 
 

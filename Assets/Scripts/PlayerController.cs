@@ -77,7 +77,12 @@ public class PlayerController : Entity
     public override bool Stun(float stunDuration = 0)
     {
         bool applied = base.Stun(stunDuration);
-        if (!applied) return applied;
+        if (!applied)
+        {
+            Debug.Log("hurt");
+            animator.SetTrigger("hurt");
+            return applied;
+        }
 
         if (hurtMotion)
         {
