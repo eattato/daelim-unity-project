@@ -74,7 +74,7 @@ public class TestEnemy : Enemy
         }
 
         player.Damage(30);
-        player.Stun(1.45f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
+        player.Stun(1.56f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
 
 
