@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+ 
 public class CameraController : MonoBehaviour
 {
     
@@ -22,6 +22,9 @@ public class CameraController : MonoBehaviour
     Transform lockon = null;
     Vector3 lookVelocity = Vector3.zero;
     Vector3 trackPos = Vector3.zero;
+    Vector3 camForward = Vector3.zero;
+    Vector3 rotationOffset = Vector3.zero;
+    List<Dictionary<string, float>> camShakeList;
 
     public Vector3 TrackPos
     {
@@ -36,7 +39,8 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        camForward = transform.forward;
+        camShakeList = new List<Dictionary<string, float>>();
     }
 
     // Update is called once per frame
@@ -48,9 +52,9 @@ public class CameraController : MonoBehaviour
         if (lockon)
         {
             Vector3 lookVector = Vector3Utils.LookVector(trackPos, lockon.position);
+            camForward = Vector3.SmoothDamp(camForward, lookVector, ref lookVelocity, lookSmoothTime);
+            transform.forward = camForward;
             transform.position = trackPos;
-            transform.forward = Vector3.SmoothDamp(transform.forward, lookVector, ref lookVelocity, lookSmoothTime);
-            //transform.LookAt(lockon);
             transform.position += transform.forward * -camDistance;
 
             float distance = Vector3.Distance(Camera.main.transform.position, lockon.position);
@@ -63,9 +67,27 @@ public class CameraController : MonoBehaviour
         {
             Quaternion rot = Quaternion.Euler(new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0) * camSensitivity);
             transform.rotation *= rot;
-            transform.position = trackPos + transform.forward * -camDistance;
+            transform.position = trackPos + camForward * -camDistance;
             transform.LookAt(trackPos);
+            camForward = transform.forward;
         }
+
+        // 이펙트 적용
+        rotationOffset = Vector3.zero;
+        List<Dictionary<string, float>> nextCamShakeList = new List<Dictionary<string, float>>();
+
+        foreach (Dictionary<string, float> camShakeInfo in camShakeList)
+        {
+            float percent = 1 - (Time.time - camShakeInfo["start"]) / camShakeInfo["duration"];
+            if (percent < 0) return;
+
+            float amount = camShakeInfo["amount"] * percent;
+            rotationOffset += Random.insideUnitSphere * amount;
+            nextCamShakeList.Add(camShakeInfo);
+        }
+
+        transform.rotation *= Quaternion.Euler(rotationOffset);
+        camShakeList = nextCamShakeList;
     }
 
     void CheckLockon()
@@ -108,5 +130,14 @@ public class CameraController : MonoBehaviour
         {
             lockonUi.gameObject.SetActive(true);
         }
+    }
+
+    public void AddCamShake(float amount, float duration)
+    {
+        Dictionary<string, float> camShakeInfo = new Dictionary<string, float>();
+        camShakeInfo.Add("start", Time.time);
+        camShakeInfo.Add("duration", duration);
+        camShakeInfo.Add("amount", amount);
+        camShakeList.Add(camShakeInfo);
     }
 }

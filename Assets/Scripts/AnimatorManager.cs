@@ -9,6 +9,7 @@ public class AnimatorManager : MonoBehaviour
     List<AnimationClip> clipList;
     Dictionary<string, Action> startActions;
     Dictionary<string, Action> endedActions;
+    AnimationEvent lastPlayedEvent = null;
 
     // Start is called before the first frame update
     void Awake()
@@ -61,6 +62,8 @@ public class AnimatorManager : MonoBehaviour
     // animEvent에 실행된 애니메이션 이벤트가 들어감
     public void OnAnimStart(AnimationEvent animEvent)
     {
+        lastPlayedEvent = animEvent;
+
         string tag = FindTag(animEvent.animatorStateInfo, startActions);
         if (tag == null) return;
 
@@ -69,6 +72,10 @@ public class AnimatorManager : MonoBehaviour
 
     public void OnAnimEnded(AnimationEvent animEvent)
     {
+        // 마지막으로 재생된 state와 이름이 다르다면, 다른 모션으로 넘어갔지만 트랜지션 때문에 마저 발동된것
+        bool cancelled = lastPlayedEvent.animatorStateInfo.fullPathHash != animEvent.animatorStateInfo.fullPathHash;
+        if (cancelled) return;
+
         string tag = FindTag(animEvent.animatorStateInfo, endedActions);
         if (tag == null) return;
 

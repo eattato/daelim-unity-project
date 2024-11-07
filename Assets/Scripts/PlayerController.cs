@@ -41,6 +41,14 @@ public class PlayerController : Entity
         hitbox = sword.GetComponent<RaycastHitbox>();
 
         animManager.AddEndedAction("action", ActionEnded);
+
+        IEnumerator co()
+        {
+            yield return new WaitForSeconds(3);
+            camController.AddCamShake(5, 0.5f);
+        }
+
+        StartCoroutine(co());
     }
 
     protected override void Update()
