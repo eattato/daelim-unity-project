@@ -22,6 +22,7 @@ public class Entity : MonoBehaviour
     // componentes
     protected Rigidbody rigid;
     protected Animator animator;
+    protected AnimatorManager animManager;
 
     // variables
     protected bool actable = true;
@@ -71,6 +72,7 @@ public class Entity : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        animManager = GetComponent<AnimatorManager>();
     }
 
     protected virtual void Update()
