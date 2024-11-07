@@ -70,6 +70,9 @@ public class TestEnemy : Enemy
 
             animator.SetTrigger("stun");
             animator.SetFloat("stunSpeed", 1);
+
+            AudioClip parrySound = SoundManager.Instance.parrySound;
+            SoundManager.Instance.CreateSoundPart(player.transform.position, parrySound, 10);
             return;
         }
 

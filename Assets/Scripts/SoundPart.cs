@@ -1,26 +1,33 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SoundPart : MonoBehaviour
 {
     [SerializeField] float soundRange = 5f;
+    [SerializeField] float duration = 1f;
+    [SerializeField] AudioClip audioClip;
+
+    AudioSource audioSource;
+    float lifeTime = 0;
+    bool init = false;
 
     public float SoundRange
     {
         get { return soundRange; }
     }
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (init && Time.time > lifeTime)
+        {
+            SoundManager.Instance.PutSoundPart(gameObject);
+        }
     }
 
     void OnDrawGizmos()
@@ -28,5 +35,19 @@ public class SoundPart : MonoBehaviour
         if (!Application.isPlaying) return;
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, soundRange);
+    }
+
+    public void Init(AudioClip clip, float soundRange, float duration)
+    {
+        this.audioClip = clip;
+        this.soundRange = soundRange;
+        this.lifeTime = Time.time + duration;
+        this.init = true;
+        audioSource.PlayOneShot(clip);
+    }
+
+    public void ResetStatus()
+    {
+        this.init = false;
     }
 }

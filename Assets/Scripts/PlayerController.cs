@@ -161,6 +161,13 @@ public class PlayerController : Entity
         enemy.Stun(0.5f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
 
+    public override void Damage(float amount, Entity damageBy = null)
+    {
+        base.Damage(amount, damageBy);
+        AudioClip hurtSound = SoundManager.Instance.hurtSounds[Random.Range(0, SoundManager.Instance.hurtSounds.Count)];
+        SoundManager.Instance.CreateSoundPart(transform.position, hurtSound, 10);
+    }
+
     void Move()
     {
         if (!movable) return;
