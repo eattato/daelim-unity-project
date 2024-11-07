@@ -39,7 +39,6 @@ public class PlayerController : Entity
         thruster = GetComponent<Thruster>();
         camController = Camera.main.GetComponent<CameraController>();
         hitbox = sword.GetComponent<RaycastHitbox>();
-
         animManager.AddEndedAction("action", ActionEnded);
 
         IEnumerator co()

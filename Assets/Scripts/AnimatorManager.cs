@@ -18,6 +18,7 @@ public class AnimatorManager : MonoBehaviour
         clipList = new List<AnimationClip>();
         startActions = new Dictionary<string, Action>();
         endedActions = new Dictionary<string, Action>();
+        AddStartAction("action", DoNothing); // 마지막으로 실행한 애니메이션 감지용도
 
         // 모든 클립에 시작/종료 애니메이션 이벤트 추가
         foreach (AnimationClip clip in animator.runtimeAnimatorController.animationClips)
@@ -36,6 +37,8 @@ public class AnimatorManager : MonoBehaviour
         }
     }
 
+    void DoNothing() {}
+
     public string FindTag(AnimatorStateInfo info, Dictionary<string, Action> actions)
     {
         foreach (string tag in actions.Keys)
@@ -51,25 +54,25 @@ public class AnimatorManager : MonoBehaviour
 
     public void AddStartAction(string tag, Action action)
     {
-        startActions.Add(tag, action);
+        startActions[tag] = action;
     }
 
     public void AddEndedAction(string tag, Action action)
     {
-        endedActions.Add(tag, action);
+        endedActions[tag] = action;
     }
 
     // animEvent에 실행된 애니메이션 이벤트가 들어감
     public void OnAnimStart(AnimationEvent animEvent)
     {
+        string tag = FindTag(animEvent.animatorStateInfo, startActions);
+        if (tag == null) return;
+
         lastPlayedEvent = animEvent;
         if (gameObject.name == "Player")
         {
             Debug.Log(animEvent.animatorClipInfo.clip.name + " start");
         }
-
-        string tag = FindTag(animEvent.animatorStateInfo, startActions);
-        if (tag == null) return;
 
         Action action = startActions[tag];
         action();
@@ -77,17 +80,17 @@ public class AnimatorManager : MonoBehaviour
 
     public void OnAnimEnded(AnimationEvent animEvent)
     {
-        // 마지막으로 재생된 state와 이름이 다르다면, 다른 모션으로 넘어갔지만 트랜지션 때문에 마저 발동된것
+        string tag = FindTag(animEvent.animatorStateInfo, endedActions);
+        if (tag == null) return;
+
         if (gameObject.name == "Player")
         {
             Debug.Log(animEvent.animatorClipInfo.clip.name + " end");
         }
 
+        // 마지막으로 재생된 state와 이름이 다르다면, 다른 모션으로 넘어갔지만 트랜지션 때문에 마저 발동된것
         bool isSame = lastPlayedEvent == null || lastPlayedEvent.animatorStateInfo.fullPathHash == animEvent.animatorStateInfo.fullPathHash;
         if (!isSame) return;
-
-        string tag = FindTag(animEvent.animatorStateInfo, endedActions);
-        if (tag == null) return;
 
         Action action = endedActions[tag];
         action();
