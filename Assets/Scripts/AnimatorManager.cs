@@ -71,7 +71,7 @@ public class AnimatorManager : MonoBehaviour
         lastPlayedEvent = animEvent;
         if (gameObject.name == "Player")
         {
-            Debug.Log(animEvent.animatorClipInfo.clip.name + " start");
+            //Debug.Log(animEvent.animatorClipInfo.clip.name + " start");
         }
 
         Action action = startActions[tag];
@@ -85,7 +85,7 @@ public class AnimatorManager : MonoBehaviour
 
         if (gameObject.name == "Player")
         {
-            Debug.Log(animEvent.animatorClipInfo.clip.name + " end");
+            //Debug.Log(animEvent.animatorClipInfo.clip.name + " end");
         }
 
         // 마지막으로 재생된 state와 이름이 다르다면, 다른 모션으로 넘어갔지만 트랜지션 때문에 마저 발동된것

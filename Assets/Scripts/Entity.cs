@@ -84,12 +84,14 @@ public class Entity : MonoBehaviour
     // state methods (called by animator / StateMachineBehaviour)
     public virtual void SetActable(int actable)
     {
+        if (died) return;
         this.actable = actable > 0;
         animator.applyRootMotion = !this.actable;
     }
 
     public virtual void SetMovable(int movable)
     {
+        if (died) return;
         this.movable = movable > 0;
         animator.applyRootMotion = !this.movable;
     }

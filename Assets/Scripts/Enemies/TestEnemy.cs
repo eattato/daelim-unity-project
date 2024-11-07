@@ -48,8 +48,11 @@ public class TestEnemy : Enemy
 
     public void ActionEnded()
     {
-        actable = true;
-        movable = true;
+        if (!died)
+        {
+            actable = true;
+            movable = true;
+        }
     }
 
 
@@ -111,5 +114,11 @@ public class TestEnemy : Enemy
 
         animator.SetInteger("variant", Random.Range(0, 2));
         animator.SetTrigger("attack");
+    }
+
+    public override void Dead()
+    {
+        base.Dead();
+        animator.SetTrigger("dead");
     }
 }

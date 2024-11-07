@@ -40,14 +40,6 @@ public class PlayerController : Entity
         camController = Camera.main.GetComponent<CameraController>();
         hitbox = sword.GetComponent<RaycastHitbox>();
         animManager.AddEndedAction("action", ActionEnded);
-
-        IEnumerator co()
-        {
-            yield return new WaitForSeconds(3);
-            camController.AddCamShake(5, 0.5f);
-        }
-
-        StartCoroutine(co());
     }
 
     protected override void Update()
@@ -127,6 +119,7 @@ public class PlayerController : Entity
 
     public void EnableHitbox()
     {
+        if (openedHitbox != null) openedHitbox.KillHitbox();
         openedHitbox = hitbox.AddHitbox("Enemy", OnHit);
     }
 
@@ -169,6 +162,7 @@ public class PlayerController : Entity
         base.Damage(amount, damageBy);
         AudioClip hurtSound = SoundManager.Instance.hurtSounds[Random.Range(0, SoundManager.Instance.hurtSounds.Count)];
         SoundManager.Instance.CreateSoundPart(transform.position, hurtSound, 10);
+        camController.AddCamShake(3, 1);
     }
 
     void Move()
