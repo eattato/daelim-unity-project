@@ -132,8 +132,11 @@ public class PlayerController : Entity
 
     public void ActionEnded()
     {
-        actable = true;
-        movable = true;
+        if (!died)
+        {
+            actable = true;
+            movable = true;
+        }
     }
 
 
@@ -221,6 +224,9 @@ public class PlayerController : Entity
             animator.applyRootMotion = false;
             animator.SetTrigger("roll");
             thruster.AddThrust(rollVelocity, rollTime);
+
+            AudioClip rollSound = SoundManager.Instance.rollSound;
+            SoundManager.Instance.CreateSoundPart(transform.position, rollSound, 10);
         }
     }
 

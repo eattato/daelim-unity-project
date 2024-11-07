@@ -156,6 +156,9 @@ public class Entity : MonoBehaviour
 
     public virtual bool Stun(float stunDuration = 0)
     {
+        AudioClip hitSound = SoundManager.Instance.hitSounds[Random.Range(0, SoundManager.Instance.hitSounds.Count)];
+        SoundManager.Instance.CreateSoundPart(transform.position, hitSound, 10);
+
         // 피격됐을때 슈퍼아머가 없거나 강인도가 약하면 깨져서 갱신됨
         bool stunned = true;
         if (!SuperArmor && defaultSuperArmor >= stunDuration) stunned = false; // 상시적용 슈퍼아머

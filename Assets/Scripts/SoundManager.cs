@@ -7,8 +7,10 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private GameObject prefab;
 
     [Header("사운드 바인딩")]
+    [SerializeField] public List<AudioClip> hitSounds = new List<AudioClip>();
     [SerializeField] public List<AudioClip> hurtSounds = new List<AudioClip>();
     [SerializeField] public AudioClip parrySound;
+    [SerializeField] public AudioClip rollSound;
 
     private static SoundManager instance = null;
     private Queue<GameObject> queue;
@@ -40,7 +42,7 @@ public class SoundManager : MonoBehaviour
         queue.Enqueue(soundPart);
     }
 
-    public GameObject CreateSoundPart(Vector3 pos, AudioClip clip, float soundRange, float lifeTime = 1)
+    public GameObject CreateSoundPart(Vector3 pos, AudioClip clip, float soundRange, float lifeTime = 3)
     {
         if (queue.Count == 0) queue.Enqueue(Instantiate(prefab));
 
