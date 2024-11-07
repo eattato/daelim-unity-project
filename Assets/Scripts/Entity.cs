@@ -137,7 +137,7 @@ public class Entity : MonoBehaviour
         staminaLastUsed = Time.time;
     }
 
-    public virtual void Damage(float amount)
+    public virtual void Damage(float amount, Entity damageBy = null)
     {
         health -= amount;
         health = Mathf.Clamp(health, 0, maxHealth);
@@ -175,6 +175,7 @@ public class Entity : MonoBehaviour
 
         movable = false;
         actable = false;
+        parrying = false;
 
         try
         {

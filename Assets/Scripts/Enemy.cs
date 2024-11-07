@@ -103,6 +103,17 @@ public class Enemy : Entity
 
 
     // state methods
+    public override void Damage(float amount, Entity damageBy = null)
+    {
+        base.Damage(amount, damageBy);
+        if (damageBy != null)
+        {
+            status = Status.OnAttack;
+            target = damageBy.transform;
+            targetLastSeenTime = Time.time;
+            targetLastSeenPos = damageBy.transform.position;
+        }
+    }
 
 
     // utils

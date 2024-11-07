@@ -14,6 +14,7 @@ public class TestEnemy : Enemy
     {
         base.Start();
         hitbox = GetComponent<RaycastHitbox>();
+        animManager.AddEndedAction("action", ActionEnded);
     }
 
 
@@ -31,19 +32,6 @@ public class TestEnemy : Enemy
         }
     }
 
-    public override bool Stun(float stunDuration = 0)
-    {
-        bool applied = base.Stun(stunDuration);
-        if (!applied) return applied;
-
-        if (openedHitbox != null)
-        {
-            openedHitbox.KillHitbox();
-            openedHitbox = null;
-        }
-        return applied;
-    }
-
     public void EnableHitbox()
     {
         openedHitbox = hitbox.AddHitbox("Player", OnHit);
@@ -56,6 +44,12 @@ public class TestEnemy : Enemy
             openedHitbox.KillHitbox();
             openedHitbox = null;
         }
+    }
+
+    public void ActionEnded()
+    {
+        actable = true;
+        movable = true;
     }
 
 

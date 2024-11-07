@@ -72,6 +72,6 @@ public class AnimatorManager : MonoBehaviour
         string tag = FindTag(animEvent.animatorStateInfo, endedActions);
         if (tag == null) return;
 
-        Action action = startActions[tag];
+        Action action = endedActions[tag];
     }
 }

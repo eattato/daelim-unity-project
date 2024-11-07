@@ -39,6 +39,8 @@ public class PlayerController : Entity
         thruster = GetComponent<Thruster>();
         camController = Camera.main.GetComponent<CameraController>();
         hitbox = sword.GetComponent<RaycastHitbox>();
+
+        animManager.AddEndedAction("action", ActionEnded);
     }
 
     protected override void Update()
@@ -52,16 +54,6 @@ public class PlayerController : Entity
 
         healthGauge.SetFilled(health / maxHealth);
         staminaGauge.SetFilled(stamina / maxStamina);
-
-        AnimatorStateInfo animInfo = animator.GetCurrentAnimatorStateInfo(0);
-        if (animInfo.IsName("hit"))
-        {
-            //Debug.Log(animInfo.normalizedTime);
-            if (animInfo.normalizedTime >= 1)
-            {
-                //EnableMove();
-            }
-        }
     }
 
 
@@ -89,12 +81,6 @@ public class PlayerController : Entity
             openedHitbox.KillHitbox();
             openedHitbox = null;
         }
-    }
-
-    public override void SetMovable(int movable)
-    {
-        base.SetMovable(movable);
-        //Debug.Log("set movable " + this.movable);
     }
 
     public override void Dead()
@@ -135,6 +121,12 @@ public class PlayerController : Entity
     public void EnableHitbox()
     {
         openedHitbox = hitbox.AddHitbox("Enemy", OnHit);
+    }
+
+    public void ActionEnded()
+    {
+        actable = true;
+        movable = true;
     }
 
 
