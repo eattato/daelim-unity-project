@@ -66,6 +66,16 @@ public class Entity : MonoBehaviour
         get { return parrying; }
     }
 
+    public float Health
+    {
+        get { return health; }
+    }
+
+    public float MaxHealth
+    {
+        get { return maxHealth; }
+    }
+
 
     // unity methods
     protected virtual void Start()
