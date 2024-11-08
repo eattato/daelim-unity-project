@@ -57,6 +57,47 @@ public class PlayerController : Entity
 
 
     // state methods
+    public override void EnableActable(AnimationEvent animEvent)
+    {
+        base.EnableActable(animEvent);
+        if (!this.actable) return;
+
+        // 재행동 가능 = 이전 행동 끝남, 이전 히트박스를 끝냄
+        if (openedHitbox != null)
+        {
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
+        }
+    }
+
+    public void EnableHitbox(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        if (openedHitbox != null) openedHitbox.KillHitbox();
+        openedHitbox = hitbox.AddHitbox("Enemy", OnHit);
+    }
+
+    public void DisableHitbox(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        if (openedHitbox != null)
+        {
+            openedHitbox.KillHitbox();
+            openedHitbox = null;
+        }
+    }
+
+    public void ActionEnded()
+    {
+        if (!died)
+        {
+            actable = true;
+            movable = true;
+        }
+    }
+
+
+    // other methods
     public override bool Stun(float stunDuration = 0)
     {
         bool applied = base.Stun(stunDuration);
@@ -69,17 +110,6 @@ public class PlayerController : Entity
         }
 
         return applied;
-    }
-
-    public override void SetActable(int actable)
-    {
-        base.SetActable(actable);
-        if (!this.actable) return;
-        if (openedHitbox != null)
-        {
-            openedHitbox.KillHitbox();
-            openedHitbox = null;
-        }
     }
 
     public override void Dead()
@@ -96,6 +126,22 @@ public class PlayerController : Entity
         }
 
         StartCoroutine(co());
+    }
+
+    public override void Damage(float amount, Entity damageBy = null)
+    {
+        base.Damage(amount, damageBy);
+        AudioClip hurtSound = SoundManager.Instance.hurtSounds[Random.Range(0, SoundManager.Instance.hurtSounds.Count)];
+        SoundManager.Instance.CreateSoundPart(transform.position, hurtSound, 10);
+        camController.AddCamShake(3, 1);
+    }
+
+    public void OnHit(RaycastHit hit) // hitbox callback
+    {
+        Enemy enemy = hit.transform.GetComponent<Enemy>();
+        if (enemy.Invincible) return;
+        enemy.Damage(20);
+        enemy.Stun(0.5f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
 
     void Attack(Vector3 lookVector)
@@ -115,54 +161,6 @@ public class PlayerController : Entity
 
         //animator.SetInteger("variant", 0);
         animator.SetTrigger("attack");
-    }
-
-    public void EnableHitbox()
-    {
-        if (openedHitbox != null) openedHitbox.KillHitbox();
-        openedHitbox = hitbox.AddHitbox("Enemy", OnHit);
-    }
-
-    public void ActionEnded()
-    {
-        if (!died)
-        {
-            actable = true;
-            movable = true;
-        }
-    }
-
-
-    // other methods
-    Vector3 GetMoveDirection(bool getForward = false)
-    {
-        Vector3 forwardVec = Camera.main.transform.forward * Input.GetAxisRaw("Vertical");
-        Vector3 rightVec = Camera.main.transform.right * Input.GetAxisRaw("Horizontal");
-
-        Vector3 moveDirection = forwardVec + rightVec;
-        moveDirection = Vector3.Normalize(new Vector3(moveDirection.x, 0, moveDirection.z));
-
-        if (getForward && moveDirection.magnitude < 0.01f)
-        {
-            moveDirection = transform.forward;
-        }
-        return moveDirection;
-    }
-
-    public void OnHit(RaycastHit hit) // hitbox callback
-    {
-        Enemy enemy = hit.transform.GetComponent<Enemy>();
-        if (enemy.Invincible) return;
-        enemy.Damage(20);
-        enemy.Stun(0.5f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
-    }
-
-    public override void Damage(float amount, Entity damageBy = null)
-    {
-        base.Damage(amount, damageBy);
-        AudioClip hurtSound = SoundManager.Instance.hurtSounds[Random.Range(0, SoundManager.Instance.hurtSounds.Count)];
-        SoundManager.Instance.CreateSoundPart(transform.position, hurtSound, 10);
-        camController.AddCamShake(3, 1);
     }
 
     void Move()
@@ -239,5 +237,20 @@ public class PlayerController : Entity
             animator.applyRootMotion = false;
             animator.SetTrigger("parry");
         }
+    }
+
+    Vector3 GetMoveDirection(bool getForward = false)
+    {
+        Vector3 forwardVec = Camera.main.transform.forward * Input.GetAxisRaw("Vertical");
+        Vector3 rightVec = Camera.main.transform.right * Input.GetAxisRaw("Horizontal");
+
+        Vector3 moveDirection = forwardVec + rightVec;
+        moveDirection = Vector3.Normalize(new Vector3(moveDirection.x, 0, moveDirection.z));
+
+        if (getForward && moveDirection.magnitude < 0.01f)
+        {
+            moveDirection = transform.forward;
+        }
+        return moveDirection;
     }
 }

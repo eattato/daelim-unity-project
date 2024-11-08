@@ -92,35 +92,66 @@ public class Entity : MonoBehaviour
 
 
     // state methods (called by animator / StateMachineBehaviour)
-    public virtual void SetActable(int actable)
+    public virtual void EnableActable(AnimationEvent animEvent)
     {
-        if (died) return;
-        this.actable = actable > 0;
-        animator.applyRootMotion = !this.actable;
+        if (!animManager.IsValidEvent(animEvent)) return;
+        actable = true;
     }
 
-    public virtual void SetMovable(int movable)
+    public virtual void DisableActable(AnimationEvent animEvent)
     {
-        if (died) return;
-        this.movable = movable > 0;
-        animator.applyRootMotion = !this.movable;
+        if (!animManager.IsValidEvent(animEvent)) return;
+        actable = false;
     }
 
-    public virtual void SetInvincible(int invincible)
+    public virtual void EnableMovable(AnimationEvent animEvent)
     {
-        this.invincible = invincible > 0;
+        if (!animManager.IsValidEvent(animEvent)) return;
+        movable = true;
+        animator.applyRootMotion = false;
     }
 
-    public virtual void SetSuperArmor(int superArmor)
+    public virtual void DisableMovable(AnimationEvent animEvent)
     {
-        // 0이면 슈퍼아머 삭제, 그 이상이면 해당 초 만큼 슈퍼아머 생성
-        // 보통은 애니메이션 이벤트에서 삭제로만 씀
-        this.superArmorTime = superArmor == 0 ? 0 : superArmor;
+        if (!animManager.IsValidEvent(animEvent)) return;
+        movable = false;
+        animator.applyRootMotion = true;
     }
 
-    public virtual void SetParrying(int parrying)
+    public virtual void EnableInvincible(AnimationEvent animEvent)
     {
-        this.parrying = parrying > 0;
+        if (!animManager.IsValidEvent(animEvent)) return;
+        invincible = true;
+    }
+
+    public virtual void DisableInvincible(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        invincible = false;
+    }
+
+    public virtual void EnableSuperArmor(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        superArmorTime = Time.time + 999;
+    }
+
+    public virtual void DisableSuperArmor(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        superArmorTime = 0;
+    }
+
+    public virtual void EnableParrying(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        parrying = true;
+    }
+
+    public virtual void DisableParrying(AnimationEvent animEvent)
+    {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        parrying = false;
     }
 
 

@@ -70404,6 +70404,13 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
+  - time: 0
+    functionName: EnableSuperArmor
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 0.6666667
     functionName: EnableHitbox
     data: 
@@ -70412,9 +70419,16 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 1.1333333
-    functionName: SetActable
+    functionName: EnableActable
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
+    messageOptions: 0
+  - time: 2.1333334
+    functionName: DisableSuperArmor
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
     messageOptions: 0

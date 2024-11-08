@@ -19,26 +19,29 @@ public class TestEnemy : Enemy
 
 
     // state methods
-    public override void SetActable(int actable)
+    public override void EnableActable(AnimationEvent animEvent)
     {
-        base.SetActable(actable);
+        base.EnableActable(animEvent);
         if (!this.actable) return;
 
         // 재행동 가능 = 이전 행동 끝남, 이전 히트박스를 끝냄
-        if (openedHitbox != null) 
+        if (openedHitbox != null)
         {
             openedHitbox.KillHitbox();
             openedHitbox = null;
         }
     }
 
-    public void EnableHitbox()
+    public void EnableHitbox(AnimationEvent animEvent)
     {
+        if (!animManager.IsValidEvent(animEvent)) return;
+        if (openedHitbox != null) openedHitbox.KillHitbox();
         openedHitbox = hitbox.AddHitbox("Player", OnHit);
     }
 
-    public void DisableHitbox()
+    public void DisableHitbox(AnimationEvent animEvent)
     {
+        if (!animManager.IsValidEvent(animEvent)) return;
         if (openedHitbox != null)
         {
             openedHitbox.KillHitbox();
@@ -83,22 +86,6 @@ public class TestEnemy : Enemy
         player.Stun(1.56f); // 1타 힛박 시간 + 2타 선딜 + 힛박 시간까지 스턴
     }
 
-
-    // enemy state methods
-    protected override void OnAttack()
-    {
-        base.OnAttack();
-        if (!target) return;
-
-        Vector3 lookVector = Vector3Utils.LookVector(transform.position, targetLastSeenPos);
-        float distance = (transform.position - target.position).magnitude;
-
-        if (distance > 2.5f) Move(lookVector);
-        else Attack(lookVector);
-
-        if (!movable) Watch(lockRotation);
-    }
-
     void Attack(Vector3 lookVector)
     {
         rigid.velocity = new Vector3(0, rigid.velocity.y, 0);
@@ -120,5 +107,21 @@ public class TestEnemy : Enemy
     {
         base.Dead();
         animator.SetTrigger("dead");
+    }
+
+
+    // enemy state methods
+    protected override void OnAttack()
+    {
+        base.OnAttack();
+        if (!target) return;
+
+        Vector3 lookVector = Vector3Utils.LookVector(transform.position, targetLastSeenPos);
+        float distance = (transform.position - target.position).magnitude;
+
+        if (distance > 2.5f) Move(lookVector);
+        else Attack(lookVector);
+
+        if (!movable) Watch(lockRotation);
     }
 }

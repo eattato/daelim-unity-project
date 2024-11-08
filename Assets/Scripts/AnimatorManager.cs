@@ -89,10 +89,16 @@ public class AnimatorManager : MonoBehaviour
         }
 
         // 마지막으로 재생된 state와 이름이 다르다면, 다른 모션으로 넘어갔지만 트랜지션 때문에 마저 발동된것
-        bool isSame = lastPlayedEvent == null || lastPlayedEvent.animatorStateInfo.fullPathHash == animEvent.animatorStateInfo.fullPathHash;
-        if (!isSame) return;
+        if (!IsValidEvent(animEvent)) return;
 
         Action action = endedActions[tag];
         action();
+    }
+
+    public bool IsValidEvent(AnimationEvent animEvent)
+    {
+        int lastHash = lastPlayedEvent.animatorStateInfo.fullPathHash;
+        int eventHash = animEvent.animatorStateInfo.fullPathHash;
+        return lastPlayedEvent == null || lastHash == eventHash;
     }
 }
