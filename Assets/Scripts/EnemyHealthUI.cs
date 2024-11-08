@@ -6,47 +6,69 @@ using TMPro;
 
 public class EnemyHealthUI : MonoBehaviour
 {
-    [SerializeField] GameObject healthUIprefab;
+    [SerializeField] Entity target;
+    [SerializeField] float damageStackTime = 2;
+    [SerializeField] float disappearTime = 7;
+    [SerializeField] bool isBoss;
 
-    Dictionary<Entity, (Transform, float, float, float)> data; // UI, 마지막 히트 시간, 마지막 기록된 체력, 마지막 업데이트된 체력
+    CanvasGroup canvasGroup;
+    GaugeUI gauge;
+    TMP_Text damageLabel;
+    TMP_Text nameLabel;
+
+    float health = 0;
+    float maxHealth = 0;
+    float damageStack = 0;
+    float lastUpdateTime = -999;
 
     // Start is called before the first frame update
     void Start()
     {
-        data = new Dictionary<Entity, (Transform, float, float, float)>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        gauge = transform.Find("hp").GetComponent<GaugeUI>();
+        damageLabel = transform.Find("damage").GetComponent<TMP_Text>();
+        nameLabel = transform.Find("damage").GetComponent<TMP_Text>();
+        health = target.Health;
+        maxHealth = target.MaxHealth;
     }
 
     // Update is called once per frame
     void Update()
     {
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        if (!isBoss)
         {
-            Entity entity = enemy.GetComponent<Entity>();
-            if (!data.ContainsKey(entity))
-            {
-                GameObject ui = Instantiate(healthUIprefab);
-                ui.transform.SetParent(transform);
-                ui.SetActive(false);
-                data[entity] = (ui.transform, -999, entity.Health, entity.Health);
-            }
-
-            (Transform ui, float lastUpdate, float health, float savedHealth) uiData = data[entity];
-            Transform entityTransform = entity.transform.Find("lockon") ? entity.transform.Find("lockon") : entity.transform;
-            uiData.ui.position = Camera.main.WorldToScreenPoint(entityTransform.position);
-
-            if (entity.Health != uiData.health)
-            {
-                GaugeUI gauge = uiData.ui.Find("hp").GetComponent<GaugeUI>();
-                gauge.SetFilled(entity.Health / entity.MaxHealth);
-
-                TMP_Text damageLabel = uiData.ui.Find("damage").GetComponent<TMP_Text>();
-                damageLabel.text = (uiData.savedHealth - entity.Health).ToString();
-
-                float updatedHealth = Time.time - uiData.lastUpdate > 2 ? entity.Health : uiData.savedHealth;
-                data[entity] = (uiData.ui, Time.time, entity.Health, updatedHealth);
-            }
-
-            uiData.ui.gameObject.SetActive(Time.time - uiData.lastUpdate < 5);
+            Transform targetTransform = target.transform.Find("lockon") ? target.transform.Find("lockon") : target.transform;
+            transform.position = Camera.main.WorldToScreenPoint(targetTransform.position);
         }
+
+        if (health != target.Health) // health changed
+        {
+            gauge.SetFilled(target.Health / target.MaxHealth);
+            if (health > target.Health)
+            {
+                damageStack += health - target.Health;
+                damageLabel.text = damageStack.ToString();
+            }
+
+            lastUpdateTime = Time.time;
+            health = target.Health;
+            canvasGroup.alpha = 1;
+        }
+
+        if (Time.time - lastUpdateTime > damageStackTime)
+        {
+            damageStack = 0;
+            damageLabel.text = "";
+        }
+
+        if (!isBoss)
+        {
+            if (Time.time - lastUpdateTime > disappearTime) canvasGroup.alpha = 0;
+        }
+    }
+
+    public void SetTarget(Entity target)
+    {
+        this.target = target;
     }
 }
